@@ -1,2240 +1,491 @@
 <!DOCTYPE html>
-
 <html lang="ko">
-
 <head>
-
-  <meta charset="UTF-8" />
-
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-
-  <title>디딤손 - 시니어 친화 키오스크</title>
-
-  <style>
-
-    * {
-
-      box-sizing: border-box;
-
-      margin: 0;
-
-      padding: 0;
-
-      font-family: 'Apple SD Gothic Neo', 'Pretendard', 'Malgun Gothic', sans-serif;
-
-      word-break: keep-all;
-
-    }
-
-
-
-    body {
-
-      background-color: #efece6;
-
-      color: #1e293b;
-
-      display: flex;
-
-      justify-content: center;
-
-      min-height: 100vh;
-
-    }
-
-
-
-    .app-container {
-
-      width: 100%;
-
-      max-width: 480px;
-
-      background-color: #faf8f5;
-
-      min-height: 100vh;
-
-      display: flex;
-
-      flex-direction: column;
-
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-
-      position: relative;
-
-      overflow-x: hidden;
-
-    }
-
-
-
-    /* 상단 헤더 */
-
-    .header {
-
-      background-color: #1e3a5f;
-
-      color: #ffffff;
-
-      padding: 18px 22px;
-
-      display: flex;
-
-      justify-content: space-between;
-
-      align-items: center;
-
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-
-    }
-
-
-
-    .header h1 {
-
-      font-size: 22px;
-
-      font-weight: 800;
-
-      letter-spacing: -0.5px;
-
-    }
-
-
-
-    .ai-badge {
-
-      background: linear-gradient(135deg, #fbbf24, #f59e0b);
-
-      color: #1e293b;
-
-      font-size: 13px;
-
-      font-weight: 800;
-
-      padding: 6px 12px;
-
-      border-radius: 20px;
-
-      display: flex;
-
-      align-items: center;
-
-      gap: 4px;
-
-    }
-
-
-
-    /* 화면 전환 공통 */
-
-    .screen {
-
-      display: none;
-
-      flex: 1;
-
-      flex-direction: column;
-
-      padding: 22px;
-
-    }
-
-
-
-    .screen.active {
-
-      display: flex;
-
-    }
-
-
-
-    /* 1단계: 3초 사용설명서 */
-
-    .guide-box {
-
-      background-color: #ffffff;
-
-      border: 2px solid #e2e8f0;
-
-      border-radius: 20px;
-
-      padding: 24px 20px;
-
-      margin-bottom: 24px;
-
-      box-shadow: 0 4px 15px rgba(0,0,0,0.04);
-
-    }
-
-
-
-    .guide-title {
-
-      font-size: 22px;
-
-      font-weight: 800;
-
-      color: #1e3a5f;
-
-      margin-bottom: 18px;
-
-      text-align: center;
-
-    }
-
-
-
-    .guide-step {
-
-      display: flex;
-
-      align-items: center;
-
-      gap: 14px;
-
-      background: #f8fafc;
-
-      padding: 14px 16px;
-
-      border-radius: 14px;
-
-      margin-bottom: 12px;
-
-      border: 1px solid #e2e8f0;
-
-    }
-
-
-
-    .step-num {
-
-      background-color: #1e3a5f;
-
-      color: #ffffff;
-
-      width: 32px;
-
-      height: 32px;
-
-      border-radius: 50%;
-
-      display: flex;
-
-      align-items: center;
-
-      justify-content: center;
-
-      font-size: 17px;
-
-      font-weight: 800;
-
-      flex-shrink: 0;
-
-    }
-
-
-
-    .step-text {
-
-      font-size: 18px;
-
-      font-weight: 700;
-
-      line-height: 1.4;
-
-      color: #334155;
-
-    }
-
-
-
-    .place-select {
-
-      display: grid;
-
-      grid-template-columns: 1fr 1fr;
-
-      gap: 12px;
-
-      margin-bottom: 24px;
-
-    }
-
-
-
-    .place-btn {
-
-      padding: 20px 12px;
-
-      font-size: 20px;
-
-      font-weight: 800;
-
-      border: 2px solid #cbd5e1;
-
-      border-radius: 16px;
-
-      background: #ffffff;
-
-      color: #475569;
-
-      cursor: pointer;
-
-    }
-
-
-
-    .place-btn.selected {
-
-      border-color: #1e3a5f;
-
-      background-color: #eff6ff;
-
-      color: #1e3a5f;
-
-    }
-
-
-
-    .big-start-btn {
-
-      width: 100%;
-
-      padding: 22px;
-
-      background-color: #1e3a5f;
-
-      color: #ffffff;
-
-      font-size: 23px;
-
-      font-weight: 800;
-
-      border: none;
-
-      border-radius: 18px;
-
-      cursor: pointer;
-
-      margin-top: auto;
-
-      box-shadow: 0 6px 16px rgba(30, 58, 95, 0.25);
-
-    }
-
-
-
-    /* 2단계: 모던 카페 우드 트레이 화면 */
-
-    .instruction-banner {
-
-      background-color: #eff6ff;
-
-      color: #1e40af;
-
-      padding: 14px 16px;
-
-      border-radius: 14px;
-
-      font-size: 18px;
-
-      font-weight: 800;
-
-      text-align: center;
-
-      margin-bottom: 18px;
-
-      border: 1px solid #bfdbfe;
-
-    }
-
-
-
-    .wood-tray {
-
-      background: linear-gradient(145deg, #d4a373, #bc8a5f);
-
-      padding: 14px;
-
-      border-radius: 26px;
-
-      box-shadow: 0 12px 24px rgba(139, 94, 52, 0.25), inset 0 2px 4px rgba(255, 255, 255, 0.4);
-
-      margin-bottom: 20px;
-
-    }
-
-
-
-    .tray-surface {
-
-      background: linear-gradient(180deg, #faedcd 0%, #f5ebe0 100%);
-
-      border-radius: 18px;
-
-      padding: 16px;
-
-      min-height: 270px;
-
-      box-shadow: inset 0 4px 12px rgba(139, 94, 52, 0.18);
-
-      display: grid;
-
-      grid-template-columns: 1fr 1fr;
-
-      gap: 12px;
-
-      align-content: start;
-
-    }
-
-
-
-    .tray-item-card {
-
-      background-color: #ffffff;
-
-      border-radius: 18px;
-
-      padding: 14px 10px;
-
-      display: flex;
-
-      flex-direction: column;
-
-      align-items: center;
-
-      text-align: center;
-
-      position: relative;
-
-      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
-
-      border: 2px solid #e2e8f0;
-
-      animation: popIn 0.25s ease-out;
-
-    }
-
-
-
-    @keyframes popIn {
-
-      0% { transform: scale(0.8); opacity: 0; }
-
-      100% { transform: scale(1); opacity: 1; }
-
-    }
-
-
-
-    .delete-item-btn {
-
-      position: absolute;
-
-      top: 8px;
-
-      right: 8px;
-
-      background-color: #fee2e2;
-
-      color: #dc2626;
-
-      border: none;
-
-      width: 28px;
-
-      height: 28px;
-
-      border-radius: 50%;
-
-      font-size: 15px;
-
-      font-weight: 900;
-
-      cursor: pointer;
-
-    }
-
-
-
-    .item-emoji {
-
-      font-size: 44px;
-
-      margin: 6px 0 8px;
-
-    }
-
-
-
-    .item-name {
-
-      font-size: 16px;
-
-      font-weight: 800;
-
-      color: #1e293b;
-
-      margin-bottom: 4px;
-
-      line-height: 1.25;
-
-    }
-
-
-
-    .item-price {
-
-      font-size: 16px;
-
-      font-weight: 800;
-
-      color: #16a34a;
-
-    }
-
-
-
-    .add-slot-btn {
-
-      border: 2.5px dashed #a98467;
-
-      border-radius: 18px;
-
-      background-color: rgba(255, 255, 255, 0.65);
-
-      min-height: 150px;
-
-      display: flex;
-
-      flex-direction: column;
-
-      align-items: center;
-
-      justify-content: center;
-
-      padding: 14px 8px;
-
-      cursor: pointer;
-
-      text-align: center;
-
-    }
-
-
-
-    .add-icon-circle {
-
-      width: 44px;
-
-      height: 44px;
-
-      border-radius: 50%;
-
-      background-color: #1e3a5f;
-
-      color: #ffffff;
-
-      font-size: 24px;
-
-      font-weight: 800;
-
-      display: flex;
-
-      align-items: center;
-
-      justify-content: center;
-
-      margin-bottom: 8px;
-
-    }
-
-
-
-    .add-slot-title {
-
-      font-size: 18px;
-
-      font-weight: 800;
-
-      color: #1e3a5f;
-
-    }
-
-
-
-    .add-slot-sub {
-
-      font-size: 14px;
-
-      font-weight: 700;
-
-      color: #64748b;
-
-    }
-
-
-
-    .checkout-bar {
-
-      margin-top: auto;
-
-      background-color: #ffffff;
-
-      border-top: 2px solid #e2e8f0;
-
-      padding: 16px 20px 20px;
-
-      margin-left: -22px;
-
-      margin-right: -22px;
-
-      margin-bottom: -22px;
-
-    }
-
-
-
-    .total-row {
-
-      display: flex;
-
-      justify-content: space-between;
-
-      align-items: center;
-
-      margin-bottom: 14px;
-
-    }
-
-
-
-    .total-label {
-
-      font-size: 19px;
-
-      font-weight: 700;
-
-      color: #475569;
-
-    }
-
-
-
-    .total-price {
-
-      font-size: 26px;
-
-      font-weight: 900;
-
-      color: #1e3a5f;
-
-    }
-
-
-
-    .pay-btn {
-
-      width: 100%;
-
-      padding: 20px;
-
-      background-color: #16a34a;
-
-      color: #ffffff;
-
-      font-size: 22px;
-
-      font-weight: 800;
-
-      border: none;
-
-      border-radius: 16px;
-
-      cursor: pointer;
-
-    }
-
-
-
-    .pay-btn:disabled {
-
-      background-color: #cbd5e1;
-
-      color: #64748b;
-
-      cursor: not-allowed;
-
-    }
-
-
-
-    /* 3단계: 포인트 적립 및 할인쿠폰 화면 */
-
-    .benefit-card {
-
-      background: #ffffff;
-
-      border: 2px solid #e2e8f0;
-
-      border-radius: 20px;
-
-      padding: 20px;
-
-      margin-bottom: 16px;
-
-      box-shadow: 0 4px 12px rgba(0,0,0,0.04);
-
-    }
-
-
-
-    .benefit-title {
-
-      font-size: 20px;
-
-      font-weight: 800;
-
-      color: #1e3a5f;
-
-      margin-bottom: 12px;
-
-      display: flex;
-
-      align-items: center;
-
-      gap: 8px;
-
-    }
-
-
-
-    .coupon-btn {
-
-      width: 100%;
-
-      padding: 16px;
-
-      border-radius: 14px;
-
-      border: 2px solid #f59e0b;
-
-      background-color: #fffbeb;
-
-      color: #b45309;
-
-      font-size: 18px;
-
-      font-weight: 800;
-
-      cursor: pointer;
-
-      display: flex;
-
-      justify-content: space-between;
-
-      align-items: center;
-
-    }
-
-
-
-    .coupon-btn.applied {
-
-      background-color: #fef3c7;
-
-      border-color: #16a34a;
-
-      color: #15803d;
-
-    }
-
-
-
-    .phone-display {
-
-      background: #f1f5f9;
-
-      border: 2px solid #cbd5e1;
-
-      border-radius: 14px;
-
-      padding: 14px;
-
-      font-size: 24px;
-
-      font-weight: 900;
-
-      text-align: center;
-
-      letter-spacing: 2px;
-
-      color: #0f172a;
-
-      margin-bottom: 12px;
-
-    }
-
-
-
-    .keypad-grid {
-
-      display: grid;
-
-      grid-template-columns: repeat(3, 1fr);
-
-      gap: 8px;
-
-    }
-
-
-
-    .key-btn {
-
-      padding: 14px 0;
-
-      font-size: 22px;
-
-      font-weight: 800;
-
-      background: #f8fafc;
-
-      border: 1.5px solid #cbd5e1;
-
-      border-radius: 12px;
-
-      cursor: pointer;
-
-    }
-
-
-
-    .key-btn:active {
-
-      background: #e2e8f0;
-
-    }
-
-
-
-    /* 영수증 선택 박스 */
-
-    .receipt-select-grid {
-
-      display: grid;
-
-      grid-template-columns: 1fr 1fr;
-
-      gap: 10px;
-
-      margin-bottom: 14px;
-
-    }
-
-
-
-    .receipt-option-btn {
-
-      padding: 14px 10px;
-
-      font-size: 17px;
-
-      font-weight: 800;
-
-      border: 2px solid #cbd5e1;
-
-      background: #f8fafc;
-
-      border-radius: 12px;
-
-      cursor: pointer;
-
-      color: #475569;
-
-    }
-
-
-
-    .receipt-option-btn.selected {
-
-      border-color: #1e3a5f;
-
-      background-color: #eff6ff;
-
-      color: #1e3a5f;
-
-    }
-
-
-
-    /* 팝업 모달 스타일 */
-
-    .modal-overlay {
-
-      display: none;
-
-      position: fixed;
-
-      inset: 0;
-
-      background: rgba(15, 23, 42, 0.65);
-
-      z-index: 100;
-
-      justify-content: center;
-
-      align-items: flex-end;
-
-      backdrop-filter: blur(2px);
-
-    }
-
-
-
-    .modal-overlay.active {
-
-      display: flex;
-
-    }
-
-
-
-    .modal-sheet {
-
-      width: 100%;
-
-      max-width: 480px;
-
-      background: #ffffff;
-
-      border-top-left-radius: 28px;
-
-      border-top-right-radius: 28px;
-
-      padding: 24px 20px 30px;
-
-      max-height: 85vh;
-
-      overflow-y: auto;
-
-      animation: slideUp 0.25s ease-out;
-
-    }
-
-
-
-    @keyframes slideUp {
-
-      from { transform: translateY(100%); }
-
-      to { transform: translateY(0); }
-
-    }
-
-
-
-    .modal-header {
-
-      display: flex;
-
-      justify-content: space-between;
-
-      align-items: center;
-
-      margin-bottom: 18px;
-
-    }
-
-
-
-    .modal-title {
-
-      font-size: 22px;
-
-      font-weight: 800;
-
-      color: #0f172a;
-
-    }
-
-
-
-    .close-btn {
-
-      background: #f1f5f9;
-
-      color: #475569;
-
-      border: none;
-
-      font-size: 17px;
-
-      font-weight: 800;
-
-      padding: 8px 14px;
-
-      border-radius: 12px;
-
-      cursor: pointer;
-
-    }
-
-
-
-    .category-grid {
-
-      display: grid;
-
-      grid-template-columns: 1fr 1fr;
-
-      gap: 12px;
-
-    }
-
-
-
-    .cat-card {
-
-      padding: 22px 12px;
-
-      border-radius: 18px;
-
-      background-color: #f8fafc;
-
-      border: 2px solid #cbd5e1;
-
-      display: flex;
-
-      flex-direction: column;
-
-      align-items: center;
-
-      gap: 8px;
-
-      cursor: pointer;
-
-      text-align: center;
-
-    }
-
-
-
-    .cat-card:active {
-
-      background-color: #eff6ff;
-
-      border-color: #1e3a5f;
-
-    }
-
-
-
-    .cat-emoji { font-size: 42px; }
-
-    .cat-name { font-size: 19px; font-weight: 800; color: #1e293b; }
-
-    .cat-sub { font-size: 13px; color: #64748b; font-weight: 600; }
-
-
-
-    .temp-grid {
-
-      display: grid;
-
-      grid-template-columns: 1fr 1fr;
-
-      gap: 14px;
-
-    }
-
-
-
-    .temp-btn {
-
-      padding: 32px 12px;
-
-      border-radius: 20px;
-
-      display: flex;
-
-      flex-direction: column;
-
-      align-items: center;
-
-      gap: 10px;
-
-      cursor: pointer;
-
-      font-size: 23px;
-
-      font-weight: 900;
-
-    }
-
-
-
-    .temp-cold { background-color: #eff6ff; color: #1d4ed8; border: 2.5px solid #3b82f6; }
-
-    .temp-hot { background-color: #fef2f2; color: #b91c1c; border: 2.5px solid #ef4444; }
-
-
-
-    .menu-grid {
-
-      display: grid;
-
-      grid-template-columns: 1fr 1fr;
-
-      gap: 12px;
-
-    }
-
-
-
-    .menu-card {
-
-      border: 2px solid #e2e8f0;
-
-      border-radius: 18px;
-
-      padding: 16px 10px;
-
-      text-align: center;
-
-      background: #ffffff;
-
-      cursor: pointer;
-
-    }
-
-
-
-    .menu-card:active { background: #eff6ff; border-color: #1e3a5f; }
-
-    .menu-emoji { font-size: 42px; margin-bottom: 8px; }
-
-    .menu-name { font-size: 17px; font-weight: 800; margin-bottom: 4px; color: #0f172a; }
-
-    .menu-desc { font-size: 13px; color: #64748b; margin-bottom: 8px; line-height: 1.3; }
-
-    .menu-price { font-size: 16px; font-weight: 800; color: #1e3a5f; }
-
-
-
-    /* 완료 화면 스타일 (영수증 포함) */
-
-    .complete-box {
-
-      text-align: center;
-
-      margin: auto 0;
-
-      padding: 10px 0;
-
-    }
-
-
-
-    .ticket-card {
-
-      background: #ffffff;
-
-      border: 2px dashed #cbd5e1;
-
-      border-radius: 20px;
-
-      padding: 20px 16px;
-
-      margin: 16px 0;
-
-      box-shadow: 0 6px 16px rgba(0,0,0,0.05);
-
-      text-align: left;
-
-    }
-
-
-
-    .receipt-header {
-
-      text-align: center;
-
-      border-bottom: 2px dashed #cbd5e1;
-
-      padding-bottom: 10px;
-
-      margin-bottom: 10px;
-
-    }
-
-
-
-    .receipt-row {
-
-      display: flex;
-
-      justify-content: space-between;
-
-      font-size: 15px;
-
-      font-weight: 700;
-
-      margin-bottom: 6px;
-
-      color: #334155;
-
-    }
-
-
-
-    .receipt-total {
-
-      border-top: 2px solid #cbd5e1;
-
-      padding-top: 8px;
-
-      margin-top: 8px;
-
-      display: flex;
-
-      justify-content: space-between;
-
-      font-size: 18px;
-
-      font-weight: 900;
-
-      color: #1e3a5f;
-
-    }
-
-  </style>
-
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>디딤손 키오스크</title>
+<style>
+:root{color-scheme:light;--bg:#f2f4f8;--card:#fff;--ink:#0f172a;--sub:#475569;--line:#e5e9f0;--pri:#3b5bff;--soft:#eaeefe;--ok:#0e9f6e;--warn:#b45309;--chip:#f1f4f9;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#0b1020;--card:#161d33;--ink:#f1f5f9;--sub:#b6c0d4;--line:#27314d;--pri:#7b93ff;--soft:#222c52;--ok:#34d399;--warn:#fbbf24;--chip:#1f2842}}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Pretendard','Apple SD Gothic Neo','Malgun Gothic','Hiragino Sans','Microsoft YaHei',sans-serif;word-break:keep-all}
+body{background:var(--bg);color:var(--ink);display:flex;justify-content:center;min-height:100vh}
+button{font:inherit;color:inherit;cursor:pointer;touch-action:manipulation;border:0;background:none}
+button:focus-visible{outline:4px solid var(--pri);outline-offset:2px}
+.app{width:100%;max-width:480px;background:var(--bg);min-height:100vh;display:flex;flex-direction:column;overflow-x:hidden}
+.app.xl{zoom:1.15}
+.top{display:flex;justify-content:space-between;align-items:center;padding:16px 20px 8px;gap:8px}
+.top h1{font-size:23px;font-weight:800;letter-spacing:-.5px}
+.tr{display:flex;gap:8px}
+.zoom,.lang{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:0 14px;min-height:44px;font-size:16px;font-weight:700}
+.steps{display:flex;gap:6px;padding:0 20px 8px}
+.steps i{flex:1;height:6px;border-radius:9px;background:var(--line)}
+.steps i.on{background:var(--pri)}
+.screen{display:none;flex:1;flex-direction:column;padding:12px 20px 20px}
+.screen.active{display:flex}
+h2.t{font-size:26px;font-weight:800;letter-spacing:-.5px;margin:4px 0 14px}
+.card{background:var(--card);border-radius:24px;padding:18px;margin-bottom:14px;box-shadow:0 2px 14px rgba(15,23,42,.06)}
+.mode{width:100%;display:flex;align-items:center;gap:16px;text-align:left;background:var(--card);border-radius:28px;padding:24px;min-height:136px;margin-bottom:16px;box-shadow:0 2px 14px rgba(15,23,42,.06)}
+.mode .mi{font-size:50px}.mode b{display:block;font-size:26px;margin-bottom:4px}.mode small{font-size:17px;font-weight:600;color:var(--sub)}
+.mode.hi{background:linear-gradient(135deg,#3b5bff,#6a7dff);color:#fff;box-shadow:0 10px 24px rgba(59,91,255,.35)}.mode.hi small{color:rgba(255,255,255,.88)}
+.mega{background:#ffd400;color:#1a1a1a;border-radius:28px;padding:24px 20px;text-align:center;margin-bottom:20px;box-shadow:0 10px 24px rgba(255,212,0,.35)}
+.mlogo b{display:block;font-size:46px;font-weight:900;letter-spacing:3px;line-height:1}
+.mlogo span{display:block;font-size:17px;font-weight:800;letter-spacing:7px;margin-top:6px}
+.mtag{display:inline-block;margin-top:14px;background:#1a1a1a;color:#ffd400;border-radius:999px;padding:8px 18px;font-size:17px;font-weight:800}
+.step{display:flex;align-items:center;gap:14px;font-size:19px;font-weight:600;line-height:1.4;padding:10px 0}
+.step i{background:var(--soft);color:var(--pri);width:40px;height:40px;border-radius:14px;display:grid;place-items:center;font-style:normal;font-weight:800;flex-shrink:0}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.opt{background:var(--card);border:2px solid transparent;border-radius:20px;padding:18px 10px;font-size:20px;font-weight:800;min-height:68px;box-shadow:0 2px 14px rgba(15,23,42,.06)}
+.opt.sm{min-height:54px;padding:10px;font-size:18px}
+.opt.sel{border-color:var(--pri);background:var(--soft);color:var(--pri)}
+.cta{width:100%;min-height:64px;background:var(--pri);color:#fff;font-size:22px;font-weight:800;border-radius:20px;box-shadow:0 8px 20px rgba(59,91,255,.3)}
+.cta:disabled{background:var(--line);color:var(--sub);box-shadow:none;cursor:not-allowed}
+.cta.ok{background:var(--ok);box-shadow:none}
+.back{align-self:flex-start;background:var(--card);border-radius:999px;padding:0 18px;min-height:44px;font-size:17px;font-weight:700;margin-bottom:8px;box-shadow:0 2px 10px rgba(15,23,42,.06)}
+.wood{background:linear-gradient(145deg,#d9b48a,#b98557);padding:12px;border-radius:30px;box-shadow:0 14px 28px rgba(120,76,36,.3),inset 0 2px 4px rgba(255,255,255,.4);margin-bottom:18px;--card:#fff;--ink:#0f172a;--sub:#475569;--chip:#f1f4f9;--pri:#3b5bff;--soft:#eaeefe;--line:#e5e9f0}
+.surface{background:linear-gradient(#f7ecd9,#efe0c8);border-radius:22px;padding:12px;min-height:290px;display:grid;grid-template-columns:1fr 1fr;gap:12px;align-content:start;box-shadow:inset 0 4px 12px rgba(120,76,36,.2)}
+.tcard{background:var(--card);color:var(--ink);border-radius:20px;padding:10px 8px 12px;text-align:center;position:relative;box-shadow:0 6px 14px rgba(0,0,0,.1);display:flex;flex-direction:column;align-items:center;gap:4px;animation:pop .25s ease-out}
+@keyframes pop{from{transform:scale(.85);opacity:0}to{transform:scale(1);opacity:1}}
+.tcard .em{font-size:40px;margin:6px 0 2px}
+.x{position:absolute;top:4px;right:4px;width:44px;height:44px;border-radius:50%;font-size:18px;font-weight:800;color:var(--sub)}
+.nm{font-size:17px;font-weight:800;line-height:1.25}.un{font-size:15px;color:var(--sub);font-weight:600;line-height:1.3}
+.pr{font-size:18px;font-weight:800;color:var(--pri)}
+.qty{display:flex;align-items:center;gap:4px;background:var(--chip);border-radius:999px;padding:4px;margin-top:4px}
+.qty button{width:44px;height:44px;border-radius:50%;background:var(--card);font-size:24px;font-weight:800;color:var(--pri);box-shadow:0 1px 4px rgba(15,23,42,.15)}
+.qty b{min-width:30px;text-align:center;font-size:20px}
+.slot{border:3px dashed #a98467;border-radius:20px;min-height:170px;background:rgba(255,255,255,.65);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:#1e293b;padding:8px}
+.slot .plus{width:52px;height:52px;border-radius:50%;background:#3b5bff;color:#fff;font-size:30px;display:grid;place-items:center}
+.slot b{font-size:18px}.slot small{font-size:15px;font-weight:600;color:#475569}
+.tabs{display:flex;gap:8px;overflow-x:auto;padding:2px 0 12px;margin-bottom:4px}
+.tab{flex-shrink:0;background:var(--card);border-radius:999px;padding:0 18px;min-height:50px;font-size:18px;font-weight:800;border:2px solid transparent;box-shadow:0 2px 10px rgba(15,23,42,.06)}
+.tab.sel{background:var(--pri);color:#fff}
+.nrow{background:var(--card);border-radius:22px;padding:12px;display:grid;grid-template-columns:56px 1fr auto;gap:12px;align-items:center;margin-bottom:10px;box-shadow:0 2px 14px rgba(15,23,42,.06)}
+.nrow .em{font-size:36px;background:var(--chip);border-radius:16px;height:56px;display:grid;place-items:center}
+.addb{min-height:50px;padding:0 20px;background:var(--pri);color:#fff;border-radius:16px;font-size:18px;font-weight:800}
+.bar{position:sticky;bottom:0;margin:auto -20px -20px;background:var(--card);padding:16px 20px 20px;border-radius:28px 28px 0 0;box-shadow:0 -6px 24px rgba(15,23,42,.1)}
+.sum{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.sum span:first-child{font-size:18px;font-weight:700;color:var(--sub)}.sum b{font-size:28px;font-weight:800}
+.tile{width:100%;display:flex;align-items:center;gap:14px;text-align:left;background:var(--card);border:2px solid transparent;border-radius:22px;padding:16px;margin-bottom:12px;box-shadow:0 2px 14px rgba(15,23,42,.06);min-height:76px}
+.tile .ic{font-size:30px;width:52px;height:52px;border-radius:16px;background:var(--chip);display:grid;place-items:center;flex-shrink:0}
+.tile .tx{flex:1}.tile b{display:block;font-size:19px}.tile small{font-size:15px;color:var(--sub);font-weight:600}
+.tile .st{font-size:16px;font-weight:800;color:var(--pri)}
+.tile.on{border-color:var(--ok);background:var(--soft)}.tile.on .st{color:var(--ok)}
+.sec{font-size:18px;font-weight:800;color:var(--sub);margin:10px 4px}
+.chips{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:-2px 0 14px}
+.chip{background:var(--card);border:2px solid var(--line);border-radius:16px;min-height:56px;font-size:18px;font-weight:800}
+.chip.sel{border-color:var(--pri);background:var(--soft);color:var(--pri)}
+.rows .r{display:flex;justify-content:space-between;gap:8px;font-size:17px;font-weight:600;padding:5px 0;color:var(--sub)}
+.rows .r.big{font-size:21px;font-weight:800;color:var(--ink);border-top:2px dashed var(--line);margin-top:6px;padding-top:12px}
+.ov{display:none;position:fixed;inset:0;background:rgba(8,12,28,.6);z-index:100;justify-content:center;align-items:flex-end}
+.ov.active{display:flex}
+.sheet{width:100%;max-width:480px;background:var(--card);color:var(--ink);border-radius:30px 30px 0 0;padding:22px 20px 28px;max-height:90vh;overflow-y:auto}
+.mh{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:16px}
+.mh h3{font-size:23px;font-weight:800}
+.close{background:var(--chip);border-radius:999px;padding:0 16px;min-height:44px;font-size:17px;font-weight:700;flex-shrink:0}
+.cat{background:var(--chip);border-radius:22px;padding:18px 8px;text-align:center}
+.cat .e{font-size:40px}.cat b{display:block;font-size:19px;margin-top:6px}
+.temp{border-radius:24px;padding:30px 8px;font-size:23px;font-weight:800}
+.temp span{display:block;font-size:46px;margin-bottom:8px}
+.cold{background:#e3eeff;color:#1d4ed8}.hot{background:#ffe9e6;color:#c2410c}
+.menu{background:var(--chip);border-radius:22px;padding:14px 10px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:4px}
+.menu .e{font-size:40px}.menu b.nm{font-size:18px}.menu em{font-style:normal;font-weight:800;font-size:18px;color:var(--pri)}
+.menu .add{width:100%;min-height:48px;background:var(--pri);color:#fff;border-radius:14px;font-size:17px;font-weight:800}
+.phone{background:var(--chip);border-radius:18px;padding:16px;font-size:28px;font-weight:800;text-align:center;letter-spacing:2px;margin-bottom:6px}
+.hint{min-height:24px;text-align:center;font-size:16px;font-weight:700;color:var(--warn);margin-bottom:8px}
+.keys{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+.keys button{min-height:60px;background:var(--chip);border-radius:16px;font-size:24px;font-weight:800}
+.keys button:active{background:var(--soft)}
+.spin{width:64px;height:64px;border:7px solid var(--line);border-top-color:var(--pri);border-radius:50%;margin:10px auto 18px;animation:sp 1s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.center{text-align:center;margin:auto 0}
+.ticket{background:var(--card);border-radius:24px;padding:18px;margin:16px 0;text-align:left;box-shadow:0 2px 14px rgba(15,23,42,.06)}
+.rh{text-align:center;padding-bottom:10px;margin-bottom:8px;border-bottom:2px dashed var(--line)}
+</style>
 </head>
-
 <body>
+<div class="app" id="app">
+  <div class="top"><h1>🤝 <span data-i="brand"></span></h1>
+    <div class="tr"><button class="zoom" id="zoom" onclick="toggleZoom()">🔍</button><button class="lang" onclick="openLang()">🌐 <span id="lang-name">한국어</span></button></div></div>
+  <div class="steps" id="steps"><i></i><i></i><i></i></div>
 
-
-
-<div class="app-container">
-
-  <!-- 상단 헤더 -->
-
-  <div class="header">
-
-    <h1>🤝 디딤손 쉬운 주문</h1>
-
-    <div class="ai-badge">👁️ AI 맞춤 큰화면</div>
-
+  <div id="s-mode" class="screen active">
+    <div class="mega"><div class="mlogo" role="img" aria-label="MEGA MGC COFFEE"><b>MEGA</b><span>MGC COFFEE</span></div><div class="mtag" data-i="megaTag"></div></div>
+    <h2 class="t" data-i="modeT"></h2>
+    <button class="mode" onclick="setMode('normal')"><span class="mi">🧾</span><span><b data-i="normal"></b><small data-i="normalS"></small></span></button>
+    <button class="mode hi" onclick="setMode('easy')"><span class="mi">🤝</span><span><b data-i="easy"></b><small data-i="easyS"></small></span></button>
   </div>
 
-
-
-  <!-- [화면 1] 3초 사용설명서 -->
-
-  <div id="screen-guide" class="screen active">
-
-    <div class="guide-box">
-
-      <div class="guide-title">📖 3초 사용설명서</div>
-
-      <div class="guide-step">
-
-        <div class="step-num">1</div>
-
-        <div class="step-text"><b>커피, 에이드, 빵</b> 등 종류를 먼저 고르세요.</div>
-
-      </div>
-
-      <div class="guide-step">
-
-        <div class="step-num">2</div>
-
-        <div class="step-text">쟁반에 <b>원하는 만큼 메뉴를 담으세요.</b></div>
-
-      </div>
-
-      <div class="guide-step" style="margin-bottom:0;">
-
-        <div class="step-num">3</div>
-
-        <div class="step-text"><b>할인·영수증 발행</b> 후 주문하면 끝!</div>
-
-      </div>
-
+  <div id="s-guide" class="screen">
+    <button class="back" data-i="back" onclick="show('s-mode')"></button>
+    <h2 class="t" data-i="gT"></h2>
+    <div class="card">
+      <div class="step"><i>1</i><span data-i="g1"></span></div>
+      <div class="step"><i>2</i><span data-i="g2"></span></div>
+      <div class="step"><i>3</i><span data-i="g3"></span></div>
     </div>
-
-
-
-    <div style="font-size: 20px; font-weight: 800; margin-bottom: 12px; color: #1e293b;">어디서 드시나요?</div>
-
-    <div class="place-select">
-
-      <button class="place-btn selected" id="btn-here" onclick="selectPlace('매장에서 먹고 가기')">🍽️ 먹고 가기</button>
-
-      <button class="place-btn" id="btn-togo" onclick="selectPlace('집으로 포장하기')">🛍️ 포장하기</button>
-
+    <div class="sec" data-i="where"></div>
+    <div class="two" style="margin-bottom:20px">
+      <button class="opt sel" data-pl="here" data-i="here" onclick="selectPlace('here')"></button>
+      <button class="opt" data-pl="togo" data-i="togo" onclick="selectPlace('togo')"></button>
     </div>
-
-
-
-    <button class="big-start-btn" onclick="goToTray()">쟁반 채우러 가기 👉</button>
-
+    <button class="cta" style="margin-top:auto" data-i="start" onclick="show('s-tray')"></button>
   </div>
 
-
-
-  <!-- [화면 2] 트레이 화면 -->
-
-  <div id="screen-tray" class="screen">
-
-    <div class="instruction-banner" id="place-banner">
-
-      👇 아래 쟁반을 눌러 메뉴를 담아주세요!
-
+  <div id="s-tray" class="screen">
+    <button class="back" data-i="back" onclick="show('s-guide')"></button>
+    <h2 class="t" data-i="myOrder"></h2>
+    <div class="wood"><div class="surface" id="tray-items"></div></div>
+    <div class="bar" style="margin-top:auto">
+      <div class="sum"><span id="cnt"></span><b id="sub"></b></div>
+      <button class="cta" id="next" onclick="show('s-benefit')"></button>
     </div>
-
-
-
-    <div class="wood-tray">
-
-      <div class="tray-surface" id="tray-items-container"></div>
-
-    </div>
-
-
-
-    <div class="checkout-bar">
-
-      <div class="total-row">
-
-        <span class="total-label" id="total-count-label">총 0개 선택</span>
-
-        <span class="total-price" id="total-price">0원</span>
-
-      </div>
-
-      <button class="pay-btn" id="pay-btn" disabled onclick="goToBenefitScreen()">
-
-        메뉴를 먼저 담아주세요
-
-      </button>
-
-    </div>
-
   </div>
 
-
-
-  <!-- [화면 3] 적립, 쿠폰, 영수증 선택 화면 -->
-
-  <div id="screen-benefit" class="screen">
-
-    <div style="font-size: 21px; font-weight: 900; margin-bottom: 14px; color: #0f172a;">
-
-      🎁 마지막 단계: 할인 및 영수증 선택
-
+  <div id="s-normal" class="screen">
+    <button class="back" data-i="back" onclick="show('s-mode')"></button>
+    <div class="two" style="margin-bottom:12px">
+      <button class="opt sm sel" data-pl="here" data-i="here" onclick="selectPlace('here')"></button>
+      <button class="opt sm" data-pl="togo" data-i="togo" onclick="selectPlace('togo')"></button>
     </div>
-
-
-
-    <!-- 할인쿠폰 카드 -->
-
-    <div class="benefit-card">
-
-      <div class="benefit-title">🎟️ 할인쿠폰 사용하기</div>
-
-      <button class="coupon-btn" id="coupon-btn" onclick="toggleCoupon()">
-
-        <span>단골 어르신 1,000원 할인쿠폰</span>
-
-        <span id="coupon-status-text">누르면 적용 👉</span>
-
-      </button>
-
+    <div class="tabs" id="tabs"></div>
+    <div id="nlist"></div>
+    <div class="bar" style="margin-top:auto">
+      <div class="sum"><span id="ncnt"></span><b id="nsub"></b></div>
+      <button class="cta" id="nnext" onclick="show('s-benefit')"></button>
     </div>
-
-
-
-    <!-- 영수증 발행 여부 선택 카드 -->
-
-    <div class="benefit-card">
-
-      <div class="benefit-title">📄 영수증을 출력할까요?</div>
-
-      <div class="receipt-select-grid">
-
-        <button class="receipt-option-btn selected" id="receipt-yes" onclick="setReceipt(true)">🧾 예 (출력하기)</button>
-
-        <button class="receipt-option-btn" id="receipt-no" onclick="setReceipt(false)">🚫 아니요 (안 함)</button>
-
-      </div>
-
-    </div>
-
-
-
-    <!-- 포인트 적립 키패드 카드 -->
-
-    <div class="benefit-card" style="margin-bottom: 10px;">
-
-      <div class="benefit-title">📱 휴대폰 번호로 포인트 적립 (선택)</div>
-
-      <div class="phone-display" id="phone-display">010 - </div>
-
-      <div class="keypad-grid">
-
-        <button class="key-btn" onclick="pressKey('1')">1</button>
-
-        <button class="key-btn" onclick="pressKey('2')">2</button>
-
-        <button class="key-btn" onclick="pressKey('3')">3</button>
-
-        <button class="key-btn" onclick="pressKey('4')">4</button>
-
-        <button class="key-btn" onclick="pressKey('5')">5</button>
-
-        <button class="key-btn" onclick="pressKey('6')">6</button>
-
-        <button class="key-btn" onclick="pressKey('7')">7</button>
-
-        <button class="key-btn" onclick="pressKey('8')">8</button>
-
-        <button class="key-btn" onclick="pressKey('9')">9</button>
-
-        <button class="key-btn" style="background:#fee2e2; color:#dc2626;" onclick="clearPhone()">지움</button>
-
-        <button class="key-btn" onclick="pressKey('0')">0</button>
-
-        <button class="key-btn" style="background:#e0f2fe; color:#0369a1;" onclick="backspacePhone()">←</button>
-
-      </div>
-
-    </div>
-
-
-
-    <div class="checkout-bar">
-
-      <div class="total-row">
-
-        <span class="total-label">최종 결제 금액</span>
-
-        <span class="total-price" id="final-benefit-price">0원</span>
-
-      </div>
-
-      <button class="pay-btn" onclick="completeOrder()">
-
-        결제 완료하기 ✅
-
-      </button>
-
-    </div>
-
   </div>
 
-
-
-  <!-- [화면 4] 주문 완료 및 영수증 내역 확인 화면 -->
-
-  <div id="screen-complete" class="screen">
-
-    <div class="complete-box">
-
-      <div style="font-size: 48px;">🎉</div>
-
-      <h2 style="font-size: 24px; font-weight: 900; margin-top: 6px;">주문이 완료되었습니다!</h2>
-
-      <p style="font-size: 16px; color: #475569; margin-top: 2px;" id="complete-place-text">매장에서 먹고 가기</p>
-
-
-
-      <!-- 디지털 영수증 명세서 카드 -->
-
-      <div class="ticket-card">
-
-        <div class="receipt-header">
-
-          <div style="font-size: 17px; font-weight: 900; color: #1e3a5f;">🤝 디딤손 매장 영수증</div>
-
-          <div style="font-size: 13px; color: #64748b;" id="receipt-time">대기번호: <b style="color:#d97706; font-size:18px;">104번</b></div>
-
-        </div>
-
-        <div id="receipt-items-list"></div>
-
-        <div id="receipt-discount-row"></div>
-
-        <div class="receipt-total">
-
-          <span>총 결제금액</span>
-
-          <span id="receipt-total-price">0원</span>
-
-        </div>
-
-        <div style="font-size: 13px; font-weight: 700; color: #16a34a; margin-top: 10px; text-align: center;" id="receipt-notice"></div>
-
-      </div>
-
-
-
-      <button class="big-start-btn" onclick="resetAll()">처음으로 돌아가기</button>
-
+  <div id="s-benefit" class="screen">
+    <button class="back" data-i="back" onclick="show(mode==='easy'?'s-tray':'s-normal')"></button>
+    <h2 class="t" data-i="benT"></h2>
+    <button class="tile" id="t-coupon" onclick="toggleCoupon()"><span class="ic">🎟️</span><span class="tx"><b data-i="coupon"></b><small data-i="couponS"></small></span><span class="st" id="st-coupon"></span></button>
+    <button class="tile" id="t-member" onclick="openKeypad('member')"><span class="ic">🎫</span><span class="tx"><b data-i="member"></b><small id="sm-member"></small></span><span class="st" id="st-member"></span></button>
+    <button class="tile" id="t-point" onclick="openKeypad('point')"><span class="ic">⭐</span><span class="tx"><b data-i="point"></b><small id="sm-point"></small></span><span class="st" id="st-point"></span></button>
+    <div class="sec" data-i="rQ"></div>
+    <div class="two">
+      <button class="opt sel" id="r-yes" data-i="print" onclick="setReceipt(true)"></button>
+      <button class="opt" id="r-no" data-i="noPrint" onclick="setReceipt(false)"></button>
     </div>
-
+    <div class="bar" style="margin-top:20px">
+      <div class="sum"><span data-i="payAmt"></span><b id="fin1"></b></div>
+      <button class="cta" data-i="nextPay" onclick="show('s-pay')"></button>
+    </div>
   </div>
 
+  <div id="s-pay" class="screen">
+    <button class="back" data-i="back" onclick="show('s-benefit')"></button>
+    <h2 class="t" data-i="payT"></h2>
+    <div class="card rows" id="pay-sum"></div>
+    <button class="tile" id="m-card" onclick="pickMethod('card')"><span class="ic">💳</span><span class="tx"><b data-i="card"></b><small data-i="cardS"></small></span></button>
+    <button class="tile" id="m-easy" onclick="pickMethod('easy')"><span class="ic">📲</span><span class="tx"><b data-i="easyPay"></b><small data-i="easyPayS"></small></span></button>
+    <div class="chips" id="easy-chips" style="display:none"></div>
+    <div class="bar" style="margin-top:auto">
+      <div class="sum"><span data-i="finalAmt"></span><b id="fin2"></b></div>
+      <button class="cta ok" id="pay-btn" disabled onclick="startPay()"></button>
+    </div>
+  </div>
+
+  <div id="s-done" class="screen">
+    <div class="center">
+      <div style="font-size:56px">🎉</div>
+      <h2 class="t" style="margin:6px 0 2px" data-i="doneT"></h2>
+      <p style="font-size:17px;color:var(--sub);font-weight:600" id="d-place"></p>
+      <div class="ticket">
+        <div class="rh"><div style="font-size:17px;font-weight:800" data-i="rcpt"></div><div style="font-size:16px;color:var(--sub);font-weight:600"><span data-i="queue"></span> <b style="color:var(--pri);font-size:26px" id="d-q"></b></div></div>
+        <div class="rows" id="d-rows"></div>
+        <div style="font-size:16px;font-weight:700;color:var(--ok);text-align:center;margin-top:10px;line-height:1.5" id="d-note"></div>
+      </div>
+      <button class="cta" data-i="home" onclick="resetAll()"></button>
+    </div>
+  </div>
 </div>
 
-
-
-<!-- 모달 1: 종류 선택 -->
-
-<div class="modal-overlay" id="modal-category">
-
-  <div class="modal-sheet">
-
-    <div class="modal-header">
-
-      <div class="modal-title">어떤 종류를 드실까요?</div>
-
-      <button class="close-btn" onclick="closeModals()">닫기 ✕</button>
-
-    </div>
-
-    <div class="category-grid">
-
-      <div class="cat-card" onclick="selectMenuCategory('coffee')">
-
-        <div class="cat-emoji">☕</div>
-
-        <div class="cat-name">커피</div>
-
-        <div class="cat-sub">아메리카노, 라떼</div>
-
-      </div>
-
-      <div class="cat-card" onclick="selectMenuCategory('ade')">
-
-        <div class="cat-emoji">🥤</div>
-
-        <div class="cat-name">에이드 · 차</div>
-
-        <div class="cat-sub">유자차, 레몬에이드</div>
-
-      </div>
-
-      <div class="cat-card" onclick="selectMenuCategory('latte')">
-
-        <div class="cat-emoji">🍓</div>
-
-        <div class="cat-name">라떼 · 초코</div>
-
-        <div class="cat-sub">딸기라떼, 초코라떼</div>
-
-      </div>
-
-      <div class="cat-card" onclick="selectMenuCategory('frappe')">
-
-        <div class="cat-emoji">🍧</div>
-
-        <div class="cat-name">스무디 · 프라페</div>
-
-        <div class="cat-sub">망고스무디, 퐁크러쉬</div>
-
-      </div>
-
-      <div class="cat-card" onclick="selectMenuCategory('season')">
-
-        <div class="cat-emoji">🌟</div>
-
-        <div class="cat-name">겨울 · 신메뉴</div>
-
-        <div class="cat-sub">모찌밀크티, 매실모과</div>
-
-      </div>
-
-      <div class="cat-card" onclick="selectMenuCategory('food')">
-
-        <div class="cat-emoji">🥐</div>
-
-        <div class="cat-name">빵 · 디저트</div>
-
-        <div class="cat-sub">소금빵, 감자빵</div>
-
-      </div>
-
-    </div>
-
-  </div>
-
-</div>
-
-
-
-<!-- 모달 2: 온도 선택 -->
-
-<div class="modal-overlay" id="modal-temp">
-
-  <div class="modal-sheet">
-
-    <div class="modal-header">
-
-      <div class="modal-title">어떤 온도로 드릴까요?</div>
-
-      <button class="close-btn" onclick="closeModals()">닫기 ✕</button>
-
-    </div>
-
-    <div class="temp-grid">
-
-      <button class="temp-btn temp-cold" onclick="showFilteredMenus('차가운')">
-
-        <span style="font-size: 48px;">❄️</span>
-
-        <span>차가운 음료</span>
-
-      </button>
-
-      <button class="temp-btn temp-hot" onclick="showFilteredMenus('따뜻한')">
-
-        <span style="font-size: 48px;">🔥</span>
-
-        <span>따뜻한 음료</span>
-
-      </button>
-
-    </div>
-
-  </div>
-
-</div>
-
-
-
-<!-- 모달 3: 세부 메뉴 선택 -->
-
-<div class="modal-overlay" id="modal-menu">
-
-  <div class="modal-sheet">
-
-    <div class="modal-header">
-
-      <div class="modal-title" id="menu-modal-title">메뉴를 골라주세요</div>
-
-      <button class="close-btn" onclick="closeModals()">닫기 ✕</button>
-
-    </div>
-
-    <div class="menu-grid" id="menu-list-container"></div>
-
-  </div>
-
-</div>
-
-
+<div class="ov" id="o-lang"><div class="sheet"><div class="mh"><h3 data-i="langT"></h3><button class="close" data-i="close" onclick="closeAll()"></button></div><div class="two" id="lang-grid"></div></div></div>
+<div class="ov" id="o-cat"><div class="sheet"><div class="mh"><h3 data-i="catT"></h3><button class="close" data-i="close" onclick="closeAll()"></button></div><div class="two" id="cat-grid"></div></div></div>
+<div class="ov" id="o-temp"><div class="sheet"><div class="mh"><h3 data-i="tempT"></h3><button class="close" data-i="close" onclick="closeAll()"></button></div>
+  <div class="two"><button class="temp cold" onclick="showTemp(1)"><span>❄️</span><i data-i="cold" style="font-style:normal"></i></button><button class="temp hot" onclick="showTemp(2)"><span>🔥</span><i data-i="hot" style="font-style:normal"></i></button></div></div></div>
+<div class="ov" id="o-menu"><div class="sheet"><div class="mh"><h3 data-i="menuT"></h3><button class="close" data-i="close" onclick="closeAll()"></button></div><div class="two" id="menu-list"></div></div></div>
+<div class="ov" id="o-key"><div class="sheet"><div class="mh"><h3 id="key-t"></h3><button class="close" data-i="close" onclick="closeAll()"></button></div>
+  <div class="phone" id="phone">010 - </div><div class="hint" id="hint"></div><div class="keys" id="keys"></div>
+  <button class="cta" data-i="ok" onclick="confirmKeypad()"></button></div></div>
+<div class="ov" id="o-paying" style="align-items:center"><div class="sheet" style="border-radius:30px;max-width:420px;margin:0 16px;text-align:center"><div class="spin"></div><h3 style="font-size:23px;margin-bottom:8px" id="pay-t"></h3><p style="font-size:18px;color:var(--sub);font-weight:600;line-height:1.5" id="pay-d"></p></div></div>
+<div class="ov" id="o-idle" style="align-items:center"><div class="sheet" style="border-radius:30px;max-width:420px;margin:0 16px;text-align:center"><div style="font-size:44px">⏰</div><h3 style="font-size:23px;margin:8px 0" data-i="idleT"></h3><p style="font-size:18px;color:var(--sub);margin-bottom:16px" id="idle-d"></p><button class="cta" data-i="idleBtn" onclick="idleKeep()"></button></div></div>
 
 <script>
-
-  let selectedPlace = '매장에서 먹고 가기';
-
-  let cartItems = [];
-
-  let selectedCategory = '';
-
-  let isCouponApplied = false;
-
-  let needReceipt = true; // 기본 영수증 출력함
-
-  let phoneDigits = '';
-
-
-
-  const menuDB = {
-
-    coffee: {
-
-      hasTemp: true,
-
-      '차가운': [
-
-        { emoji: '🧊☕', name: '아이스 아메리카노', desc: '기본 2샷 시원한 커피', price: 2000 },
-
-        { emoji: '🧊💪', name: '메가리카노 (대용량)', desc: '32oz 엄청 큰 아메리카노', price: 3300 },
-
-        { emoji: '🤎', name: '할메가커피', desc: '달달한 옛날 믹스커피 스타일', price: 2100 },
-
-        { emoji: '🌾', name: '할메가미숫커피', desc: '미숫가루 + 커피 조합', price: 2900 }
-
-      ],
-
-      '따뜻한': [
-
-        { emoji: '☕', name: '따뜻한 아메리카노', desc: '기본 2샷 따뜻한 커피', price: 1700 },
-
-        { emoji: '🥛', name: '따뜻한 카페라떼', desc: '부드러운 우유 커피', price: 2900 }
-
-      ]
-
-    },
-
-    ade: {
-
-      hasTemp: true,
-
-      '차가운': [
-
-        { emoji: '🥤', name: '메가에이드', desc: '레몬 + 라임 + 자몽 조합', price: 3900 },
-
-        { emoji: '🍋', name: '레몬에이드', desc: '상큼시원한 레몬 음료', price: 3500 },
-
-        { emoji: '🍑', name: '제로 복숭아아이스티', desc: '칼로리 없는 복숭아 티', price: 3000 }
-
-      ],
-
-      '따뜻한': [
-
-        { emoji: '🍊', name: '따뜻한 유자차', desc: '향긋하고 달콤한 전통차', price: 3300 },
-
-        { emoji: '🍎', name: '사과유자차', desc: '사과와 유자의 상콤달콤', price: 3500 }
-
-      ]
-
-    },
-
-    latte: {
-
-      hasTemp: true,
-
-      '차가운': [
-
-        { emoji: '🍓', name: '딸기라떼 (ICE)', desc: '달콤상큼 생딸기 우유', price: 3700 },
-
-        { emoji: '🍫', name: '아이스 초코라떼', desc: '진한 초코 음료', price: 3500 }
-
-      ],
-
-      '따뜻한': [
-
-        { emoji: '🍫', name: '따뜻한 초코라떼', desc: '속이 따뜻해지는 초코', price: 3500 },
-
-        { emoji: '🍠', name: '따뜻한 고구마라떼', desc: '든든하고 달콤한 고구마', price: 3500 }
-
-      ]
-
-    },
-
-    frappe: {
-
-      hasTemp: false,
-
-      items: [
-
-        { emoji: '🍪', name: '쿠키프라페', desc: '달콤한 쿠키 앤 크림', price: 3900 },
-
-        { emoji: '🥭', name: '골드망고스무디', desc: '달콤시원한 망고 스무디', price: 3900 },
-
-        { emoji: '🫐', name: '블루베리 요거트스무디', desc: '새콤달콤 요거트', price: 3900 }
-
-      ]
-
-    },
-
-    season: {
-
-      hasTemp: false,
-
-      items: [
-
-        { emoji: '🍒🍫', name: '딥 초코 체리 프라페', desc: '겨울 시즌 진한 초코+체리', price: 4400 },
-
-        { emoji: '🧋', name: '쫀득 모찌 밀크티', desc: '율무·우롱 + 모찌펄 토핑', price: 4000 },
-
-        { emoji: '🍵', name: '향긋한 매실 모과차', desc: '겨울 한정 모과청 블렌딩', price: 3500 }
-
-      ]
-
-    },
-
-    food: {
-
-      hasTemp: false,
-
-      items: [
-
-        { emoji: '🥐', name: '버터버터 소금빵', desc: '겉바속촉 소금빵', price: 3200 },
-
-        { emoji: '🥪', name: '햄치즈 구운 식빵', desc: '따뜻한 크로크무슈', price: 3900 },
-
-        { emoji: '🥔', name: '담백한 감자빵', desc: '진짜 감자 모양 쫄깃빵', price: 3500 }
-
-      ]
-
-    }
-
-  };
-
-
-
-  function selectPlace(place) {
-
-    selectedPlace = place;
-
-    document.getElementById('btn-here').classList.toggle('selected', place === '매장에서 먹고 가기');
-
-    document.getElementById('btn-togo').classList.toggle('selected', place === '집으로 포장하기');
-
-  }
-
-
-
-  function goToTray() {
-
-    document.getElementById('screen-guide').classList.remove('active');
-
-    document.getElementById('screen-tray').classList.add('active');
-
-    document.getElementById('place-banner').innerText = `[${selectedPlace}] 쟁반에 원하는 메뉴를 담아주세요!`;
-
-    renderTray();
-
-  }
-
-
-
-  function renderTray() {
-
-    const container = document.getElementById('tray-items-container');
-
-    container.innerHTML = '';
-
-
-
-    cartItems.forEach((item, index) => {
-
-      const card = document.createElement('div');
-
-      card.className = 'tray-item-card';
-
-      card.innerHTML = `
-
-        <button class="delete-item-btn" onclick="removeItem(${index})">✕</button>
-
-        <div class="item-emoji">${item.emoji}</div>
-
-        <div class="item-name">${item.name}</div>
-
-        <div class="item-price">${item.price.toLocaleString()}원</div>
-
-      `;
-
-      container.appendChild(card);
-
-    });
-
-
-
-    const addBtn = document.createElement('div');
-
-    addBtn.className = 'add-slot-btn';
-
-    addBtn.onclick = openCategoryModal;
-
-    addBtn.innerHTML = `
-
-      <div class="add-icon-circle">+</div>
-
-      <div class="add-slot-title">${cartItems.length === 0 ? '메뉴 담기' : '메뉴 더 담기'}</div>
-
-      <div class="add-slot-sub">눌러서 종류 선택</div>
-
-    `;
-
-    container.appendChild(addBtn);
-
-
-
-    const totalCount = cartItems.length;
-
-    const totalPrice = getRawTotal();
-
-
-
-    document.getElementById('total-count-label').innerText = `총 ${totalCount}개 선택`;
-
-    document.getElementById('total-price').innerText = `${totalPrice.toLocaleString()}원`;
-
-
-
-    const payBtn = document.getElementById('pay-btn');
-
-    if (totalCount > 0) {
-
-      payBtn.disabled = false;
-
-      payBtn.innerText = `다음: 적립·할인받기 👉`;
-
-    } else {
-
-      payBtn.disabled = true;
-
-      payBtn.innerText = '메뉴를 먼저 담아주세요';
-
-    }
-
-  }
-
-
-
-  function getRawTotal() {
-
-    return cartItems.reduce((sum, item) => sum + item.price, 0);
-
-  }
-
-
-
-  function removeItem(index) {
-
-    cartItems.splice(index, 1);
-
-    renderTray();
-
-  }
-
-
-
-  function openCategoryModal() {
-
-    document.getElementById('modal-category').classList.add('active');
-
-  }
-
-
-
-  function selectMenuCategory(catKey) {
-
-    selectedCategory = catKey;
-
-    closeModals();
-
-
-
-    const categoryData = menuDB[catKey];
-
-    if (categoryData.hasTemp) {
-
-      document.getElementById('modal-temp').classList.add('active');
-
-    } else {
-
-      renderMenuCards(categoryData.items, '원하시는 메뉴를 골라주세요');
-
-      document.getElementById('modal-menu').classList.add('active');
-
-    }
-
-  }
-
-
-
-  function showFilteredMenus(temp) {
-
-    closeModals();
-
-    const items = menuDB[selectedCategory][temp];
-
-    renderMenuCards(items, `${temp} 메뉴를 골라주세요`);
-
-    document.getElementById('modal-menu').classList.add('active');
-
-  }
-
-
-
-  function renderMenuCards(items, titleText) {
-
-    document.getElementById('menu-modal-title').innerText = titleText;
-
-    const container = document.getElementById('menu-list-container');
-
-    container.innerHTML = '';
-
-
-
-    items.forEach(item => {
-
-      const card = document.createElement('div');
-
-      card.className = 'menu-card';
-
-      card.innerHTML = `
-
-        <div class="menu-emoji">${item.emoji}</div>
-
-        <div class="menu-name">${item.name}</div>
-
-        <div class="menu-desc">${item.desc}</div>
-
-        <div class="menu-price">${item.price.toLocaleString()}원</div>
-
-      `;
-
-      card.onclick = () => {
-
-        cartItems.push(item);
-
-        renderTray();
-
-        closeModals();
-
-      };
-
-      container.appendChild(card);
-
-    });
-
-  }
-
-
-
-  function closeModals() {
-
-    document.getElementById('modal-category').classList.remove('active');
-
-    document.getElementById('modal-temp').classList.remove('active');
-
-    document.getElementById('modal-menu').classList.remove('active');
-
-  }
-
-
-
-  function goToBenefitScreen() {
-
-    document.getElementById('screen-tray').classList.remove('active');
-
-    document.getElementById('screen-benefit').classList.add('active');
-
-    updateBenefitPrice();
-
-  }
-
-
-
-  function toggleCoupon() {
-
-    isCouponApplied = !isCouponApplied;
-
-    const btn = document.getElementById('coupon-btn');
-
-    const statusText = document.getElementById('coupon-status-text');
-
-    
-
-    if (isCouponApplied) {
-
-      btn.classList.add('applied');
-
-      statusText.innerText = '적용 완료 (-1,000원) ✅';
-
-    } else {
-
-      btn.classList.remove('applied');
-
-      statusText.innerText = '누르면 적용 👉';
-
-    }
-
-    updateBenefitPrice();
-
-  }
-
-
-
-  function setReceipt(status) {
-
-    needReceipt = status;
-
-    document.getElementById('receipt-yes').classList.toggle('selected', status);
-
-    document.getElementById('receipt-no').classList.toggle('selected', !status);
-
-  }
-
-
-
-  function pressKey(num) {
-
-    if (phoneDigits.length < 8) {
-
-      phoneDigits += num;
-
-      updatePhoneDisplay();
-
-    }
-
-  }
-
-
-
-  function backspacePhone() {
-
-    phoneDigits = phoneDigits.slice(0, -1);
-
-    updatePhoneDisplay();
-
-  }
-
-
-
-  function clearPhone() {
-
-    phoneDigits = '';
-
-    updatePhoneDisplay();
-
-  }
-
-
-
-  function updatePhoneDisplay() {
-
-    let formatted = '010 - ';
-
-    if (phoneDigits.length <= 4) {
-
-      formatted += phoneDigits;
-
-    } else {
-
-      formatted += phoneDigits.slice(0, 4) + ' - ' + phoneDigits.slice(4);
-
-    }
-
-    document.getElementById('phone-display').innerText = formatted;
-
-  }
-
-
-
-  function updateBenefitPrice() {
-
-    let finalPrice = getRawTotal() - (isCouponApplied ? 1000 : 0);
-
-    if (finalPrice < 0) finalPrice = 0;
-
-    document.getElementById('final-benefit-price').innerText = `${finalPrice.toLocaleString()}원`;
-
-  }
-
-
-
-  function completeOrder() {
-
-    document.getElementById('screen-benefit').classList.remove('active');
-
-    document.getElementById('screen-complete').classList.add('active');
-
-    document.getElementById('complete-place-text').innerText = `주문 방식: ${selectedPlace}`;
-
-
-
-    // 영수증 내역 생성
-
-    const listContainer = document.getElementById('receipt-items-list');
-
-    listContainer.innerHTML = '';
-
-    cartItems.forEach(item => {
-
-      const row = document.createElement('div');
-
-      row.className = 'receipt-row';
-
-      row.innerHTML = `<span>${item.name}</span><span>${item.price.toLocaleString()}원</span>`;
-
-      listContainer.appendChild(row);
-
-    });
-
-
-
-    const discountRow = document.getElementById('receipt-discount-row');
-
-    if (isCouponApplied) {
-
-      discountRow.innerHTML = `<div class="receipt-row" style="color:#b45309;"><span>단골 쿠폰 할인</span><span>-1,000원</span></div>`;
-
-    } else {
-
-      discountRow.innerHTML = '';
-
-    }
-
-
-
-    let finalPrice = getRawTotal() - (isCouponApplied ? 1000 : 0);
-
-    if (finalPrice < 0) finalPrice = 0;
-
-    document.getElementById('receipt-total-price').innerText = `${finalPrice.toLocaleString()}원`;
-
-
-
-    let noticeText = needReceipt ? '🧾 종이 영수증이 출력되고 있습니다.' : '🚫 종이 영수증은 출력하지 않았습니다.';
-
-    if (phoneDigits.length === 8) {
-
-      noticeText += ` / 📱 010-${phoneDigits.slice(0,4)}-${phoneDigits.slice(4)} 적립 완료`;
-
-    }
-
-    document.getElementById('receipt-notice').innerText = noticeText;
-
-  }
-
-
-
-  function resetAll() {
-
-    cartItems = [];
-
-    isCouponApplied = false;
-
-    needReceipt = true;
-
-    phoneDigits = '';
-
-    setReceipt(true);
-
-    updatePhoneDisplay();
-
-    
-
-    const btn = document.getElementById('coupon-btn');
-
-    btn.classList.remove('applied');
-
-    document.getElementById('coupon-status-text').innerText = '누르면 적용 👉';
-
-
-
-    document.getElementById('screen-complete').classList.remove('active');
-
-    document.getElementById('screen-guide').classList.add('active');
-
-  }
-
+/* [이모지, ko, en, ja, zh, 가격, 설명ko, 설명en] */
+const M=[
+['🧊☕','아이스 아메리카노','Iced Americano','アイスアメリカーノ','冰美式',2000,'기본 2샷 시원한 커피','Classic 2-shot iced coffee'],
+['🧊💪','메가리카노 (대용량)','Mega Americano (Large)','メガアメリカーノ(大)','大杯美式',3300,'32oz 큰 아메리카노','Extra-large 32oz'],
+['🤎','할메가커피','Halmega Coffee','ハルメガコーヒー','哈梅加咖啡',2100,'달달한 옛날 믹스커피 맛','Sweet classic mix-coffee taste'],
+['🌾','할메가미숫커피','Halmega Misugaru Coffee','ハルメガ ミスカル珈琲','哈梅加炒米咖啡',2900,'미숫가루 + 커피','Grain powder + coffee'],
+['☕','따뜻한 아메리카노','Hot Americano','ホットアメリカーノ','热美式',1700,'기본 2샷 따뜻한 커피','Classic 2-shot hot coffee'],
+['🥛','따뜻한 카페라떼','Hot Café Latte','ホットカフェラテ','热拿铁',2900,'부드러운 우유 커피','Smooth milk coffee'],
+['🥤','메가에이드','Mega Ade','メガエード','综合特饮',3900,'레몬 + 라임 + 자몽','Lemon + lime + grapefruit'],
+['🍋','레몬에이드','Lemonade','レモンエード','柠檬特饮',3500,'상큼시원한 레몬 음료','Fresh, cool lemon drink'],
+['🍑','제로 복숭아아이스티','Zero Peach Iced Tea','ゼロ ピーチアイスティー','零卡水蜜桃冰茶',3000,'칼로리 없는 복숭아 티','Zero-calorie peach tea'],
+['🍊','따뜻한 유자차','Hot Citron Tea','ホットゆず茶','热柚子茶',3300,'향긋하고 달콤한 전통차','Fragrant, sweet traditional tea'],
+['🍎','사과유자차','Apple Citron Tea','りんごゆず茶','苹果柚子茶',3500,'사과와 유자의 상콤달콤','Sweet-tart apple & citron'],
+['🍓','딸기라떼 (ICE)','Iced Strawberry Latte','アイスいちごラテ','冰草莓拿铁',3700,'달콤상큼 생딸기 우유','Fresh strawberry milk'],
+['🍫','아이스 초코라떼','Iced Choco Latte','アイスチョコラテ','冰巧克力拿铁',3500,'진한 초코 음료','Rich chocolate drink'],
+['🍫','따뜻한 초코라떼','Hot Choco Latte','ホットチョコラテ','热巧克力拿铁',3500,'속이 따뜻해지는 초코','Warming chocolate'],
+['🍠','따뜻한 고구마라떼','Hot Sweet Potato Latte','ホットさつまいもラテ','热红薯拿铁',3500,'든든하고 달콤한 고구마','Hearty, sweet potato'],
+['🍪','쿠키프라페','Cookie Frappe','クッキーフラッペ','饼干冰沙',3900,'달콤한 쿠키 앤 크림','Sweet cookies & cream'],
+['🥭','골드망고스무디','Gold Mango Smoothie','ゴールドマンゴースムージー','金芒果冰沙',3900,'달콤시원한 망고','Sweet, cool mango'],
+['🫐','블루베리 요거트스무디','Blueberry Yogurt Smoothie','ブルーベリーヨーグルトスムージー','蓝莓酸奶冰沙',3900,'새콤달콤 요거트','Sweet-tart yogurt'],
+['🍒🍫','딥 초코 체리 프라페','Deep Choco Cherry Frappe','ディープチョコチェリーフラッペ','浓巧克力樱桃冰沙',4400,'겨울 시즌 초코+체리','Winter special choco + cherry'],
+['🧋','쫀득 모찌 밀크티','Chewy Mochi Milk Tea','もちもちミルクティー','Q弹麻糬奶茶',4000,'율무·우롱 + 모찌펄','Job’s tears/oolong + mochi pearls'],
+['🍵','향긋한 매실 모과차','Plum Quince Tea','梅とかりん茶','梅子木瓜茶',3500,'겨울 한정 모과청','Winter-only quince blend'],
+['🥐','버터버터 소금빵','Butter Salt Bread','バターバター塩パン','黄油海盐面包',3200,'겉바속촉 소금빵','Crisp outside, soft inside'],
+['🥪','햄치즈 구운 식빵','Grilled Ham & Cheese','ハムチーズトースト','火腿芝士烤吐司',3900,'따뜻한 크로크무슈','Warm croque monsieur'],
+['🥔','담백한 감자빵','Potato Bread','じゃがいもパン','土豆面包',3500,'진짜 감자 모양 쫄깃빵','Chewy potato-shaped bread']];
+/* [이모지, 차가운/전체 id들, 따뜻한 id들] */
+const CATS=[['☕',[0,1,2,3],[4,5]],['🥤',[6,7,8],[9,10]],['🍓',[11,12],[13,14]],['🍧',[15,16,17]],['🌟',[18,19,20]],['🥐',[21,22,23]]];
+const LANGS=[['ko','한국어'],['en','English'],['ja','日本語'],['zh','中文']];
+const EASY=['카카오페이','네이버페이','삼성페이','토스페이'];
+/* 번역: [ko, en, ja, zh] */
+const T={
+zoom:['글씨 크게/작게','Toggle large text','文字サイズ切替','切换大字体'],
+brand:['디딤손','Didimson','Didimson','Didimson'],
+megaTag:['메가MGC커피 전용 키오스크','MEGA MGC COFFEE exclusive kiosk','メガMGCコーヒー専用キオスク','MEGA MGC COFFEE 专用点餐机'],
+modeT:['주문 방식을 선택해주세요','Choose how to order','注文方法を選んでください','请选择点餐方式'],
+normal:['일반 주문','Standard Order','通常注文','普通点餐'],
+normalS:['메뉴를 한눈에 보고 주문해요','Browse the full menu','メニューを見て注文','浏览菜单点餐'],
+easy:['간편 주문','Easy Order','かんたん注文','简易点餐'],
+easyS:['디딤손 · 큰 글씨 쉬운 주문','Didimson · Large, simple ordering','Didimson・大きな文字で簡単注文','Didimson · 大字简易点餐'],
+back:['← 이전','← Back','← 戻る','← 返回'],
+gT:['쉽고 편한 주문','Easy, comfortable ordering','やさしく楽な注文','轻松简单的点餐'],
+g1:['커피·에이드·빵 종류를 고르세요','Pick a type: coffee, ade or bread','コーヒー・エード・パンの種類を選びます','先选择咖啡、特饮或面包'],
+g2:['개수를 정하고 담기를 누르세요','Set the quantity and tap Add','数を決めて「入れる」を押します','选好数量后点“加入”'],
+g3:['혜택 선택 후 결제하면 끝!','Choose perks, pay, and you’re done!','特典を選んで支払えば完了!','选择优惠并付款即可!'],
+where:['어디서 드시나요?','Eat in or take out?','ご利用方法は?','堂食还是外带?'],
+here:['🍽️ 먹고 가기','🍽️ Eat in','🍽️ 店内','🍽️ 堂食'],
+togo:['🛍️ 포장하기','🛍️ Take out','🛍️ お持ち帰り','🛍️ 外带'],
+start:['주문 시작하기 👉','Start ordering 👉','注文を始める 👉','开始点餐 👉'],
+myOrder:['내 쟁반','My Tray','マイトレー','我的托盘'],
+addMenu:['메뉴 담기','Add item','メニューを追加','添加餐点'],
+addMore:['메뉴 더 담기','Add more','さらに追加','继续添加'],
+slotSub:['눌러서 종류 선택','Tap to choose','タップして選択','点击选择'],
+cnt:['총 {n}개','{n} items','合計 {n}点','共 {n} 件'],
+next:['다음: 혜택 · 적립 👉','Next: Perks 👉','次へ:特典 👉','下一步:优惠 👉'],
+needFirst:['메뉴를 먼저 담아주세요','Add an item first','先にメニューを追加','请先添加餐点'],
+add:['담기','Add','入れる','加入'],
+c0:['커피','Coffee','コーヒー','咖啡'],c1:['에이드 · 차','Ade & Tea','エード・茶','特饮・茶'],c2:['라떼 · 초코','Latte & Choco','ラテ・チョコ','拿铁・巧克力'],
+c3:['스무디 · 프라페','Smoothie & Frappe','スムージー','冰沙'],c4:['겨울 · 신메뉴','Winter Specials','冬の新メニュー','冬季新品'],c5:['빵 · 디저트','Bakery','パン・デザート','面包・甜点'],
+catT:['어떤 종류를 드실까요?','Choose a category','種類を選んでください','请选择种类'],
+close:['닫기 ✕','Close ✕','閉じる ✕','关闭 ✕'],
+tempT:['어떤 온도로 드릴까요?','Hot or iced?','温度を選んでください','热的还是冰的?'],
+cold:['차가운 음료','Iced drinks','冷たい飲み物','冰饮'],hot:['따뜻한 음료','Hot drinks','温かい飲み物','热饮'],
+menuT:['메뉴를 골라주세요','Choose an item','メニューを選んでください','请选择餐点'],
+addN:['{n}개 담기','Add {n}','{n}個入れる','加入 {n} 个'],
+empty:['아직 담은 메뉴가 없어요','Your tray is empty','まだ何もありません','还没有添加餐点'],
+benT:['혜택 · 적립','Perks & Points','特典・ポイント','优惠・积分'],
+coupon:['할인쿠폰','Coupon','クーポン','优惠券'],
+couponS:['단골 어르신 1,000원 할인','₩1,000 loyal-customer coupon','常連クーポン ₩1,000引き','老顾客优惠 减₩1,000'],
+apply:['적용하기','Apply','適用','使用'],applied:['적용됨 ✅','Applied ✅','適用済み ✅','已使用 ✅'],
+member:['멤버십 할인','Membership','メンバーシップ','会员'],
+memberS:['번호 입력 시 5% 할인','5% off with your number','番号入力で5%引き','输入号码享95折'],
+input:['입력','Enter','入力','输入'],change:['변경','Edit','変更','修改'],
+point:['포인트 적립','Earn points','ポイント','积分'],
+pointS:['휴대폰 번호로 3% 적립','Earn 3% by phone number','電話番号で3%還元','手机号累积3%'],
+pointOn:['{n} 적립 예정','Earn {n}','{n} 付与予定','将累积 {n}'],
+rQ:['영수증을 출력할까요?','Print a receipt?','レシートを出力しますか?','是否打印小票?'],
+print:['🧾 출력','🧾 Print','🧾 出力','🧾 打印'],noPrint:['🚫 안 함','🚫 No','🚫 しない','🚫 不打印'],
+payAmt:['결제할 금액','Amount due','お支払い金額','应付金额'],
+nextPay:['다음: 결제 수단 👉','Next: Payment 👉','次へ:お支払い 👉','下一步:付款 👉'],
+keyMember:['🎫 멤버십 번호 (휴대폰)','🎫 Membership (phone no.)','🎫 会員番号(電話)','🎫 会员号(手机)'],
+keyPoint:['⭐ 적립할 휴대폰 번호','⭐ Phone number for points','⭐ ポイント用電話番号','⭐ 积分手机号'],
+ok:['확인','Confirm','確認','确认'],
+more:['{n}자리 더 눌러주세요','{n} more digits','あと{n}桁','还需 {n} 位'],
+need8:['8자리를 모두 눌러주세요','Enter all 8 digits','8桁すべて入力してください','请输入全部8位'],
+clear:['지움','Clear','消去','清除'],
+payT:['결제 수단','Payment','お支払い方法','付款方式'],
+orderAmt:['주문 금액','Subtotal','注文金額','订单金额'],
+mDisc:['멤버십 5% 할인','Membership 5% off','会員5%割引','会员95折'],
+total:['결제 금액','Total','お支払い','应付'],
+card:['신용 · 체크카드','Credit / Debit card','クレジット・デビット','信用卡 / 借记卡'],
+cardS:['카드를 꽂아주세요','Insert your card','カードを挿入','请插入银行卡'],
+easyPay:['간편결제','Mobile pay','モバイル決済','移动支付'],
+easyPayS:['휴대폰으로 결제','Pay with your phone','スマホで支払い','用手机支付'],
+finalAmt:['최종 결제 금액','Final amount','最終金額','最终金额'],
+pickM:['결제 수단을 골라주세요','Choose a payment method','支払い方法を選んでください','请选择付款方式'],
+pickE:['간편결제 종류를 골라주세요','Choose a mobile pay app','決済アプリを選んでください','请选择支付应用'],
+payBtn:['{n} 결제하기','Pay {n}','{n}を支払う','支付 {n}'],
+insC:['카드를 꽂아주세요','Insert your card','カードを挿入してください','请插入银行卡'],
+insCD:['카드 단말기에 카드를 끝까지 넣고 잠시 기다려 주세요.','Push the card all the way in and wait a moment.','カードを奥まで入れてお待ちください。','请将卡完全插入并稍候。'],
+payingE:['{n} 결제 중','Paying with {n}','{n}で決済中','正在使用 {n} 支付'],
+approve:['휴대폰에서 결제를 승인해 주세요.','Please approve the payment on your phone.','スマホで決済を承認してください。','请在手机上确认付款。'],
+doneT:['결제가 완료되었어요!','Payment complete!','お支払いが完了しました!','付款完成!'],
+rcpt:['디딤손 영수증','Didimson Receipt','Didimson レシート','Didimson 小票'],
+queue:['대기번호','Order No.','受付番号','取餐号'],
+cardShort:['카드','Card','カード','银行卡'],payM:['결제 수단','Payment','支払い方法','付款方式'],
+rcptOn:['🧾 영수증이 출력됩니다.','🧾 Your receipt is printing.','🧾 レシートを出力します。','🧾 正在打印小票。'],
+rcptOff:['🚫 영수증은 출력하지 않아요.','🚫 No receipt printed.','🚫 レシートは出力しません。','🚫 不打印小票。'],
+earned:['⭐ {n} 적립','⭐ Earned {n}','⭐ {n} 付与','⭐ 已累积 {n}'],
+home:['처음으로 돌아가기','Back to start','最初に戻る','回到首页'],
+idleT:['계속 주문하시겠어요?','Still ordering?','注文を続けますか?','继续点餐吗?'],
+idleD:['{n}초 뒤 처음 화면으로 돌아갑니다.','Returning to start in {n}s.','{n}秒後に最初の画面に戻ります。','{n} 秒后返回首页。'],
+idleBtn:['네, 계속할게요','Yes, continue','はい、続けます','是,继续'],
+langT:['언어 선택','Language','言語','语言']};
+
+const COUPON=1000,MEMBER_RATE=.05,POINT_RATE=.03,MAX=9;
+let lang='ko',LI=0,cur='s-mode',mode='easy',place='here',cart=[],cat=0,ncat=0,coupon=false,receipt=true,member='',point='',method='',easy='',kp='',kd='',queue=104;
+const $=id=>document.getElementById(id);
+const t=(k,n)=>{const s=(T[k]||[])[LI]||k;return n===undefined?s:s.replace('{n}',n)};
+const nm=id=>M[id][1+LI],ds=id=>LI===0?M[id][6]:LI===1?M[id][7]:'';
+const won=n=>LI===0?n.toLocaleString()+'원':'₩'+n.toLocaleString();
+const sub=()=>cart.reduce((s,c)=>s+M[c.id][5]*c.q,0),cnt=()=>cart.reduce((s,c)=>s+c.q,0);
+const memberOff=()=>member?Math.floor(sub()*MEMBER_RATE/10)*10:0,couponOff=()=>coupon?COUPON:0;
+const fin=()=>Math.max(0,sub()-couponOff()-memberOff());
+const earnTo=()=>point||member,earn=()=>earnTo()?Math.floor(fin()*POINT_RATE):0;
+const fmt=d=>'010-'+d.slice(0,4)+'-'+d.slice(4);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const STEP={'s-mode':0,'s-guide':0,'s-tray':1,'s-normal':1,'s-benefit':2,'s-pay':3,'s-done':3};
+
+function applyLang(){
+  document.documentElement.lang=lang;
+  document.querySelectorAll('[data-i]').forEach(e=>e.textContent=t(e.dataset.i));
+  $('lang-name').textContent=LANGS[LI][1];$('zoom').setAttribute('aria-label',t('zoom'));
+  render();
+}
+function setLang(l){lang=l;LI=LANGS.findIndex(x=>x[0]===l);closeAll();applyLang()}
+function openLang(){
+  $('lang-grid').innerHTML=LANGS.map(([k,n])=>`<button class="opt${k===lang?' sel':''}" onclick="setLang('${k}')">${n}</button>`).join('');
+  $('o-lang').classList.add('active');
+}
+function render(){
+  ({'s-tray':renderTray,'s-normal':renderNormal,'s-benefit':renderBenefit,'s-pay':renderPay,'s-done':buildDone}[cur]||(()=>{}))();
+}
+function show(id){
+  cur=id;document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('active',s.id===id));
+  [...$('steps').children].forEach((x,i)=>x.classList.toggle('on',i<STEP[id]));
+  window.scrollTo(0,0);render();
+}
+function toggleZoom(){$('app').classList.toggle('xl')}
+function setMode(m){mode=m;show(m==='easy'?'s-guide':'s-normal')}
+function selectPlace(p){place=p;document.querySelectorAll('[data-pl]').forEach(b=>b.classList.toggle('sel',b.dataset.pl===p))}
+
+const stepper=(minus,plus,q)=>`<div class="qty"><button aria-label="−" onclick="${minus}">−</button><b>${q}</b><button aria-label="+" onclick="${plus}">+</button></div>`;
+function renderTray(){
+  const s=$('tray-items');s.innerHTML='';
+  cart.forEach((c,i)=>{
+    const d=document.createElement('div');d.className='tcard';
+    d.innerHTML=`<button class="x" aria-label="${esc(nm(c.id))} ✕" onclick="del(${i})">✕</button><div class="em">${M[c.id][0]}</div><div class="nm">${esc(nm(c.id))}</div><div class="pr">${won(M[c.id][5]*c.q)}</div>${stepper(`chg(${i},-1)`,`chg(${i},1)`,c.q)}`;
+    s.appendChild(d);
+  });
+  const a=document.createElement('button');a.className='slot';a.onclick=openCat;
+  a.innerHTML=`<div class="plus">+</div><b>${t(cart.length?'addMore':'addMenu')}</b><small>${t('slotSub')}</small>`;
+  s.appendChild(a);
+  $('cnt').textContent=t('cnt',cnt());$('sub').textContent=won(sub());
+  const b=$('next');b.disabled=!cart.length;b.textContent=cart.length?t('next'):t('needFirst');
+}
+function chg(i,d){cart[i].q=Math.min(MAX,Math.max(1,cart[i].q+d));renderTray()}
+function del(i){cart.splice(i,1);renderTray()}
+function put(id,q){const f=cart.find(c=>c.id===id);if(f)f.q=Math.min(MAX,f.q+q);else cart.push({id,q});}
+function addItem(id,q){put(id,q);closeAll();render()}
+
+function renderNormal(){
+  $('tabs').innerHTML=CATS.map((c,i)=>`<button class="tab${i===ncat?' sel':''}" onclick="ncat=${i};renderNormal()">${c[0]} ${t('c'+i)}</button>`).join('');
+  $('nlist').innerHTML=CATS[ncat][1].concat(CATS[ncat][2]||[]).map(id=>{
+    const c=cart.find(x=>x.id===id);
+    return `<div class="nrow"><div class="em">${M[id][0]}</div><div><div class="nm">${esc(nm(id))}</div><div class="un">${esc(ds(id))}</div><div class="pr">${won(M[id][5])}</div></div>${c?stepper(`nchg(${id},-1)`,`nchg(${id},1)`,c.q):`<button class="addb" onclick="addItem(${id},1)">${t('add')}</button>`}</div>`;
+  }).join('');
+  $('ncnt').textContent=t('cnt',cnt());$('nsub').textContent=won(sub());
+  const b=$('nnext');b.disabled=!cart.length;b.textContent=cart.length?t('next'):t('needFirst');
+}
+function nchg(id,d){const c=cart.find(x=>x.id===id);c.q=Math.min(MAX,c.q+d);if(c.q<1)cart.splice(cart.indexOf(c),1);renderNormal()}
+
+function openCat(){
+  $('cat-grid').innerHTML=CATS.map((c,i)=>`<button class="cat" onclick="pickCat(${i})"><div class="e">${c[0]}</div><b>${t('c'+i)}</b></button>`).join('');
+  $('o-cat').classList.add('active');
+}
+function pickCat(k){cat=k;closeAll();CATS[k][2]?$('o-temp').classList.add('active'):renderMenus(CATS[k][1])}
+function showTemp(n){closeAll();renderMenus(CATS[cat][n])}
+function renderMenus(ids){
+  const g=$('menu-list');g.innerHTML='';
+  ids.forEach(id=>{
+    let q=1;const d=document.createElement('div');d.className='menu';
+    d.innerHTML=`<div class="e">${M[id][0]}</div><b class="nm">${esc(nm(id))}</b><div class="un">${esc(ds(id))}</div><em>${won(M[id][5])}</em>${stepper('','',1)}<button class="add"></button>`;
+    const [m,p]=d.querySelectorAll('.qty button'),n=d.querySelector('.qty b'),a=d.querySelector('.add');
+    const up=()=>{n.textContent=q;a.textContent=t('addN',q)};up();
+    m.onclick=()=>{q=Math.max(1,q-1);up()};p.onclick=()=>{q=Math.min(MAX,q+1);up()};a.onclick=()=>addItem(id,q);
+    g.appendChild(d);
+  });
+  $('o-menu').classList.add('active');
+}
+const OVS=['o-lang','o-cat','o-temp','o-menu','o-key'];
+function closeAll(){OVS.forEach(i=>$(i).classList.remove('active'))}
+OVS.forEach(i=>$(i).addEventListener('click',e=>{if(e.target.id===i)closeAll()}));
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeAll()});
+
+function toggleCoupon(){coupon=!coupon;renderBenefit()}
+function setReceipt(v){receipt=v;$('r-yes').classList.toggle('sel',v);$('r-no').classList.toggle('sel',!v)}
+function renderBenefit(){
+  $('t-coupon').classList.toggle('on',coupon);$('st-coupon').textContent=t(coupon?'applied':'apply');
+  $('t-member').classList.toggle('on',!!member);$('st-member').textContent=t(member?'change':'input');
+  $('sm-member').textContent=member?`${fmt(member)} · -${won(memberOff())}`:t('memberS');
+  $('t-point').classList.toggle('on',!!point);$('st-point').textContent=t(point?'change':'input');
+  $('sm-point').textContent=point?`${fmt(point)} · ${t('pointOn',won(earn()))}`:t('pointS');
+  $('fin1').textContent=won(fin());
+}
+['1','2','3','4','5','6','7','8','9','clear','0','←'].forEach(k=>{
+  const b=document.createElement('button');if(k==='clear')b.dataset.i='clear';else b.textContent=k;
+  b.onclick=()=>{if(k==='clear')kd='';else if(k==='←')kd=kd.slice(0,-1);else if(kd.length<8)kd+=k;drawKey()};
+  $('keys').appendChild(b);
+});
+function drawKey(){$('phone').textContent='010 - '+(kd.length<=4?kd:kd.slice(0,4)+' - '+kd.slice(4));$('hint').textContent=kd.length&&kd.length<8?t('more',8-kd.length):''}
+function openKeypad(m){kp=m;kd=(m==='member'?member:point)||'';$('key-t').textContent=t(m==='member'?'keyMember':'keyPoint');
+  document.querySelectorAll('#keys [data-i]').forEach(e=>e.textContent=t(e.dataset.i));drawKey();$('o-key').classList.add('active')}
+function confirmKeypad(){
+  if(kd.length!==8&&kd.length!==0){$('hint').textContent=t('need8');return}
+  if(kp==='member')member=kd;else point=kd;closeAll();renderBenefit();
+}
+
+function renderPay(){
+  const r=[[t('orderAmt'),won(sub())]];
+  if(coupon)r.push([t('coupon'),'-'+won(COUPON)]);
+  if(member)r.push([t('mDisc'),'-'+won(memberOff())]);
+  $('pay-sum').innerHTML=r.map(x=>`<div class="r"><span>${x[0]}</span><span>${x[1]}</span></div>`).join('')+`<div class="r big"><span>${t('total')}</span><span>${won(fin())}</span></div>`;
+  $('fin2').textContent=won(fin());
+  ['card','easy'].forEach(k=>$('m-'+k).classList.toggle('on',method===k));
+  const c=$('easy-chips');c.style.display=method==='easy'?'grid':'none';
+  c.innerHTML=EASY.map(n=>`<button class="chip${easy===n?' sel':''}" onclick="pickEasy('${n}')">${n}</button>`).join('');
+  const ready=method==='card'||(method==='easy'&&easy),b=$('pay-btn');b.disabled=!ready;
+  b.textContent=!method?t('pickM'):ready?t('payBtn',won(fin())):t('pickE');
+}
+function pickMethod(m){method=m;if(m==='card')easy='';renderPay()}
+function pickEasy(n){easy=n;renderPay()}
+function startPay(){
+  const c=method==='card';
+  $('pay-t').textContent=c?t('insC'):t('payingE',easy);$('pay-d').textContent=c?t('insCD'):t('approve');
+  idleAt=Date.now();$('o-paying').classList.add('active');
+  setTimeout(()=>{$('o-paying').classList.remove('active');show('s-done')},2500);
+}
+function buildDone(){
+  $('d-place').textContent=t(place);$('d-q').textContent=queue;
+  const rows=cart.map(c=>`<div class="r"><span>${esc(nm(c.id))} × ${c.q}</span><span>${won(M[c.id][5]*c.q)}</span></div>`);
+  if(coupon)rows.push(`<div class="r"><span>${t('coupon')}</span><span>-${won(COUPON)}</span></div>`);
+  if(member)rows.push(`<div class="r"><span>${t('mDisc')}</span><span>-${won(memberOff())}</span></div>`);
+  rows.push(`<div class="r"><span>${t('payM')}</span><span>${method==='card'?t('cardShort'):esc(easy)}</span></div>`,`<div class="r big"><span>${t('total')}</span><span>${won(fin())}</span></div>`);
+  $('d-rows').innerHTML=rows.join('');
+  let n=t(receipt?'rcptOn':'rcptOff');
+  if(earnTo())n+=`<br>${fmt(earnTo())} · ${t('earned',won(earn()))}`;
+  $('d-note').innerHTML=n;
+}
+function resetAll(){
+  cart=[];coupon=false;member='';point='';method='';easy='';kd='';queue++;
+  setReceipt(true);closeAll();$('o-idle').classList.remove('active');show('s-mode');
+}
+
+let idleAt=Date.now(),left=0;
+const idleOn=()=>$('o-idle').classList.contains('active');
+function idleKeep(){idleAt=Date.now();$('o-idle').classList.remove('active')}
+['pointerdown','keydown'].forEach(e=>document.addEventListener(e,()=>{if(!idleOn())idleAt=Date.now()}));
+setInterval(()=>{
+  if(cur==='s-mode'||$('o-paying').classList.contains('active')){idleAt=Date.now();return}
+  if(!idleOn()&&Date.now()-idleAt>60000){left=15;$('idle-d').textContent=t('idleD',left);$('o-idle').classList.add('active')}
+  else if(idleOn()){left--;$('idle-d').textContent=t('idleD',Math.max(left,0));if(left<=0)resetAll()}
+},1000);
+applyLang();
 </script>
-
-
-
 </body>
-
 </html>
-
