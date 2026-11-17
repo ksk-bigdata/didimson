@@ -1,0 +1,2240 @@
+<!DOCTYPE html>
+
+<html lang="ko">
+
+<head>
+
+  <meta charset="UTF-8" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
+  <title>디딤손 - 시니어 친화 키오스크</title>
+
+  <style>
+
+    * {
+
+      box-sizing: border-box;
+
+      margin: 0;
+
+      padding: 0;
+
+      font-family: 'Apple SD Gothic Neo', 'Pretendard', 'Malgun Gothic', sans-serif;
+
+      word-break: keep-all;
+
+    }
+
+
+
+    body {
+
+      background-color: #efece6;
+
+      color: #1e293b;
+
+      display: flex;
+
+      justify-content: center;
+
+      min-height: 100vh;
+
+    }
+
+
+
+    .app-container {
+
+      width: 100%;
+
+      max-width: 480px;
+
+      background-color: #faf8f5;
+
+      min-height: 100vh;
+
+      display: flex;
+
+      flex-direction: column;
+
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+
+      position: relative;
+
+      overflow-x: hidden;
+
+    }
+
+
+
+    /* 상단 헤더 */
+
+    .header {
+
+      background-color: #1e3a5f;
+
+      color: #ffffff;
+
+      padding: 18px 22px;
+
+      display: flex;
+
+      justify-content: space-between;
+
+      align-items: center;
+
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+
+    }
+
+
+
+    .header h1 {
+
+      font-size: 22px;
+
+      font-weight: 800;
+
+      letter-spacing: -0.5px;
+
+    }
+
+
+
+    .ai-badge {
+
+      background: linear-gradient(135deg, #fbbf24, #f59e0b);
+
+      color: #1e293b;
+
+      font-size: 13px;
+
+      font-weight: 800;
+
+      padding: 6px 12px;
+
+      border-radius: 20px;
+
+      display: flex;
+
+      align-items: center;
+
+      gap: 4px;
+
+    }
+
+
+
+    /* 화면 전환 공통 */
+
+    .screen {
+
+      display: none;
+
+      flex: 1;
+
+      flex-direction: column;
+
+      padding: 22px;
+
+    }
+
+
+
+    .screen.active {
+
+      display: flex;
+
+    }
+
+
+
+    /* 1단계: 3초 사용설명서 */
+
+    .guide-box {
+
+      background-color: #ffffff;
+
+      border: 2px solid #e2e8f0;
+
+      border-radius: 20px;
+
+      padding: 24px 20px;
+
+      margin-bottom: 24px;
+
+      box-shadow: 0 4px 15px rgba(0,0,0,0.04);
+
+    }
+
+
+
+    .guide-title {
+
+      font-size: 22px;
+
+      font-weight: 800;
+
+      color: #1e3a5f;
+
+      margin-bottom: 18px;
+
+      text-align: center;
+
+    }
+
+
+
+    .guide-step {
+
+      display: flex;
+
+      align-items: center;
+
+      gap: 14px;
+
+      background: #f8fafc;
+
+      padding: 14px 16px;
+
+      border-radius: 14px;
+
+      margin-bottom: 12px;
+
+      border: 1px solid #e2e8f0;
+
+    }
+
+
+
+    .step-num {
+
+      background-color: #1e3a5f;
+
+      color: #ffffff;
+
+      width: 32px;
+
+      height: 32px;
+
+      border-radius: 50%;
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+      font-size: 17px;
+
+      font-weight: 800;
+
+      flex-shrink: 0;
+
+    }
+
+
+
+    .step-text {
+
+      font-size: 18px;
+
+      font-weight: 700;
+
+      line-height: 1.4;
+
+      color: #334155;
+
+    }
+
+
+
+    .place-select {
+
+      display: grid;
+
+      grid-template-columns: 1fr 1fr;
+
+      gap: 12px;
+
+      margin-bottom: 24px;
+
+    }
+
+
+
+    .place-btn {
+
+      padding: 20px 12px;
+
+      font-size: 20px;
+
+      font-weight: 800;
+
+      border: 2px solid #cbd5e1;
+
+      border-radius: 16px;
+
+      background: #ffffff;
+
+      color: #475569;
+
+      cursor: pointer;
+
+    }
+
+
+
+    .place-btn.selected {
+
+      border-color: #1e3a5f;
+
+      background-color: #eff6ff;
+
+      color: #1e3a5f;
+
+    }
+
+
+
+    .big-start-btn {
+
+      width: 100%;
+
+      padding: 22px;
+
+      background-color: #1e3a5f;
+
+      color: #ffffff;
+
+      font-size: 23px;
+
+      font-weight: 800;
+
+      border: none;
+
+      border-radius: 18px;
+
+      cursor: pointer;
+
+      margin-top: auto;
+
+      box-shadow: 0 6px 16px rgba(30, 58, 95, 0.25);
+
+    }
+
+
+
+    /* 2단계: 모던 카페 우드 트레이 화면 */
+
+    .instruction-banner {
+
+      background-color: #eff6ff;
+
+      color: #1e40af;
+
+      padding: 14px 16px;
+
+      border-radius: 14px;
+
+      font-size: 18px;
+
+      font-weight: 800;
+
+      text-align: center;
+
+      margin-bottom: 18px;
+
+      border: 1px solid #bfdbfe;
+
+    }
+
+
+
+    .wood-tray {
+
+      background: linear-gradient(145deg, #d4a373, #bc8a5f);
+
+      padding: 14px;
+
+      border-radius: 26px;
+
+      box-shadow: 0 12px 24px rgba(139, 94, 52, 0.25), inset 0 2px 4px rgba(255, 255, 255, 0.4);
+
+      margin-bottom: 20px;
+
+    }
+
+
+
+    .tray-surface {
+
+      background: linear-gradient(180deg, #faedcd 0%, #f5ebe0 100%);
+
+      border-radius: 18px;
+
+      padding: 16px;
+
+      min-height: 270px;
+
+      box-shadow: inset 0 4px 12px rgba(139, 94, 52, 0.18);
+
+      display: grid;
+
+      grid-template-columns: 1fr 1fr;
+
+      gap: 12px;
+
+      align-content: start;
+
+    }
+
+
+
+    .tray-item-card {
+
+      background-color: #ffffff;
+
+      border-radius: 18px;
+
+      padding: 14px 10px;
+
+      display: flex;
+
+      flex-direction: column;
+
+      align-items: center;
+
+      text-align: center;
+
+      position: relative;
+
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
+
+      border: 2px solid #e2e8f0;
+
+      animation: popIn 0.25s ease-out;
+
+    }
+
+
+
+    @keyframes popIn {
+
+      0% { transform: scale(0.8); opacity: 0; }
+
+      100% { transform: scale(1); opacity: 1; }
+
+    }
+
+
+
+    .delete-item-btn {
+
+      position: absolute;
+
+      top: 8px;
+
+      right: 8px;
+
+      background-color: #fee2e2;
+
+      color: #dc2626;
+
+      border: none;
+
+      width: 28px;
+
+      height: 28px;
+
+      border-radius: 50%;
+
+      font-size: 15px;
+
+      font-weight: 900;
+
+      cursor: pointer;
+
+    }
+
+
+
+    .item-emoji {
+
+      font-size: 44px;
+
+      margin: 6px 0 8px;
+
+    }
+
+
+
+    .item-name {
+
+      font-size: 16px;
+
+      font-weight: 800;
+
+      color: #1e293b;
+
+      margin-bottom: 4px;
+
+      line-height: 1.25;
+
+    }
+
+
+
+    .item-price {
+
+      font-size: 16px;
+
+      font-weight: 800;
+
+      color: #16a34a;
+
+    }
+
+
+
+    .add-slot-btn {
+
+      border: 2.5px dashed #a98467;
+
+      border-radius: 18px;
+
+      background-color: rgba(255, 255, 255, 0.65);
+
+      min-height: 150px;
+
+      display: flex;
+
+      flex-direction: column;
+
+      align-items: center;
+
+      justify-content: center;
+
+      padding: 14px 8px;
+
+      cursor: pointer;
+
+      text-align: center;
+
+    }
+
+
+
+    .add-icon-circle {
+
+      width: 44px;
+
+      height: 44px;
+
+      border-radius: 50%;
+
+      background-color: #1e3a5f;
+
+      color: #ffffff;
+
+      font-size: 24px;
+
+      font-weight: 800;
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+      margin-bottom: 8px;
+
+    }
+
+
+
+    .add-slot-title {
+
+      font-size: 18px;
+
+      font-weight: 800;
+
+      color: #1e3a5f;
+
+    }
+
+
+
+    .add-slot-sub {
+
+      font-size: 14px;
+
+      font-weight: 700;
+
+      color: #64748b;
+
+    }
+
+
+
+    .checkout-bar {
+
+      margin-top: auto;
+
+      background-color: #ffffff;
+
+      border-top: 2px solid #e2e8f0;
+
+      padding: 16px 20px 20px;
+
+      margin-left: -22px;
+
+      margin-right: -22px;
+
+      margin-bottom: -22px;
+
+    }
+
+
+
+    .total-row {
+
+      display: flex;
+
+      justify-content: space-between;
+
+      align-items: center;
+
+      margin-bottom: 14px;
+
+    }
+
+
+
+    .total-label {
+
+      font-size: 19px;
+
+      font-weight: 700;
+
+      color: #475569;
+
+    }
+
+
+
+    .total-price {
+
+      font-size: 26px;
+
+      font-weight: 900;
+
+      color: #1e3a5f;
+
+    }
+
+
+
+    .pay-btn {
+
+      width: 100%;
+
+      padding: 20px;
+
+      background-color: #16a34a;
+
+      color: #ffffff;
+
+      font-size: 22px;
+
+      font-weight: 800;
+
+      border: none;
+
+      border-radius: 16px;
+
+      cursor: pointer;
+
+    }
+
+
+
+    .pay-btn:disabled {
+
+      background-color: #cbd5e1;
+
+      color: #64748b;
+
+      cursor: not-allowed;
+
+    }
+
+
+
+    /* 3단계: 포인트 적립 및 할인쿠폰 화면 */
+
+    .benefit-card {
+
+      background: #ffffff;
+
+      border: 2px solid #e2e8f0;
+
+      border-radius: 20px;
+
+      padding: 20px;
+
+      margin-bottom: 16px;
+
+      box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+
+    }
+
+
+
+    .benefit-title {
+
+      font-size: 20px;
+
+      font-weight: 800;
+
+      color: #1e3a5f;
+
+      margin-bottom: 12px;
+
+      display: flex;
+
+      align-items: center;
+
+      gap: 8px;
+
+    }
+
+
+
+    .coupon-btn {
+
+      width: 100%;
+
+      padding: 16px;
+
+      border-radius: 14px;
+
+      border: 2px solid #f59e0b;
+
+      background-color: #fffbeb;
+
+      color: #b45309;
+
+      font-size: 18px;
+
+      font-weight: 800;
+
+      cursor: pointer;
+
+      display: flex;
+
+      justify-content: space-between;
+
+      align-items: center;
+
+    }
+
+
+
+    .coupon-btn.applied {
+
+      background-color: #fef3c7;
+
+      border-color: #16a34a;
+
+      color: #15803d;
+
+    }
+
+
+
+    .phone-display {
+
+      background: #f1f5f9;
+
+      border: 2px solid #cbd5e1;
+
+      border-radius: 14px;
+
+      padding: 14px;
+
+      font-size: 24px;
+
+      font-weight: 900;
+
+      text-align: center;
+
+      letter-spacing: 2px;
+
+      color: #0f172a;
+
+      margin-bottom: 12px;
+
+    }
+
+
+
+    .keypad-grid {
+
+      display: grid;
+
+      grid-template-columns: repeat(3, 1fr);
+
+      gap: 8px;
+
+    }
+
+
+
+    .key-btn {
+
+      padding: 14px 0;
+
+      font-size: 22px;
+
+      font-weight: 800;
+
+      background: #f8fafc;
+
+      border: 1.5px solid #cbd5e1;
+
+      border-radius: 12px;
+
+      cursor: pointer;
+
+    }
+
+
+
+    .key-btn:active {
+
+      background: #e2e8f0;
+
+    }
+
+
+
+    /* 영수증 선택 박스 */
+
+    .receipt-select-grid {
+
+      display: grid;
+
+      grid-template-columns: 1fr 1fr;
+
+      gap: 10px;
+
+      margin-bottom: 14px;
+
+    }
+
+
+
+    .receipt-option-btn {
+
+      padding: 14px 10px;
+
+      font-size: 17px;
+
+      font-weight: 800;
+
+      border: 2px solid #cbd5e1;
+
+      background: #f8fafc;
+
+      border-radius: 12px;
+
+      cursor: pointer;
+
+      color: #475569;
+
+    }
+
+
+
+    .receipt-option-btn.selected {
+
+      border-color: #1e3a5f;
+
+      background-color: #eff6ff;
+
+      color: #1e3a5f;
+
+    }
+
+
+
+    /* 팝업 모달 스타일 */
+
+    .modal-overlay {
+
+      display: none;
+
+      position: fixed;
+
+      inset: 0;
+
+      background: rgba(15, 23, 42, 0.65);
+
+      z-index: 100;
+
+      justify-content: center;
+
+      align-items: flex-end;
+
+      backdrop-filter: blur(2px);
+
+    }
+
+
+
+    .modal-overlay.active {
+
+      display: flex;
+
+    }
+
+
+
+    .modal-sheet {
+
+      width: 100%;
+
+      max-width: 480px;
+
+      background: #ffffff;
+
+      border-top-left-radius: 28px;
+
+      border-top-right-radius: 28px;
+
+      padding: 24px 20px 30px;
+
+      max-height: 85vh;
+
+      overflow-y: auto;
+
+      animation: slideUp 0.25s ease-out;
+
+    }
+
+
+
+    @keyframes slideUp {
+
+      from { transform: translateY(100%); }
+
+      to { transform: translateY(0); }
+
+    }
+
+
+
+    .modal-header {
+
+      display: flex;
+
+      justify-content: space-between;
+
+      align-items: center;
+
+      margin-bottom: 18px;
+
+    }
+
+
+
+    .modal-title {
+
+      font-size: 22px;
+
+      font-weight: 800;
+
+      color: #0f172a;
+
+    }
+
+
+
+    .close-btn {
+
+      background: #f1f5f9;
+
+      color: #475569;
+
+      border: none;
+
+      font-size: 17px;
+
+      font-weight: 800;
+
+      padding: 8px 14px;
+
+      border-radius: 12px;
+
+      cursor: pointer;
+
+    }
+
+
+
+    .category-grid {
+
+      display: grid;
+
+      grid-template-columns: 1fr 1fr;
+
+      gap: 12px;
+
+    }
+
+
+
+    .cat-card {
+
+      padding: 22px 12px;
+
+      border-radius: 18px;
+
+      background-color: #f8fafc;
+
+      border: 2px solid #cbd5e1;
+
+      display: flex;
+
+      flex-direction: column;
+
+      align-items: center;
+
+      gap: 8px;
+
+      cursor: pointer;
+
+      text-align: center;
+
+    }
+
+
+
+    .cat-card:active {
+
+      background-color: #eff6ff;
+
+      border-color: #1e3a5f;
+
+    }
+
+
+
+    .cat-emoji { font-size: 42px; }
+
+    .cat-name { font-size: 19px; font-weight: 800; color: #1e293b; }
+
+    .cat-sub { font-size: 13px; color: #64748b; font-weight: 600; }
+
+
+
+    .temp-grid {
+
+      display: grid;
+
+      grid-template-columns: 1fr 1fr;
+
+      gap: 14px;
+
+    }
+
+
+
+    .temp-btn {
+
+      padding: 32px 12px;
+
+      border-radius: 20px;
+
+      display: flex;
+
+      flex-direction: column;
+
+      align-items: center;
+
+      gap: 10px;
+
+      cursor: pointer;
+
+      font-size: 23px;
+
+      font-weight: 900;
+
+    }
+
+
+
+    .temp-cold { background-color: #eff6ff; color: #1d4ed8; border: 2.5px solid #3b82f6; }
+
+    .temp-hot { background-color: #fef2f2; color: #b91c1c; border: 2.5px solid #ef4444; }
+
+
+
+    .menu-grid {
+
+      display: grid;
+
+      grid-template-columns: 1fr 1fr;
+
+      gap: 12px;
+
+    }
+
+
+
+    .menu-card {
+
+      border: 2px solid #e2e8f0;
+
+      border-radius: 18px;
+
+      padding: 16px 10px;
+
+      text-align: center;
+
+      background: #ffffff;
+
+      cursor: pointer;
+
+    }
+
+
+
+    .menu-card:active { background: #eff6ff; border-color: #1e3a5f; }
+
+    .menu-emoji { font-size: 42px; margin-bottom: 8px; }
+
+    .menu-name { font-size: 17px; font-weight: 800; margin-bottom: 4px; color: #0f172a; }
+
+    .menu-desc { font-size: 13px; color: #64748b; margin-bottom: 8px; line-height: 1.3; }
+
+    .menu-price { font-size: 16px; font-weight: 800; color: #1e3a5f; }
+
+
+
+    /* 완료 화면 스타일 (영수증 포함) */
+
+    .complete-box {
+
+      text-align: center;
+
+      margin: auto 0;
+
+      padding: 10px 0;
+
+    }
+
+
+
+    .ticket-card {
+
+      background: #ffffff;
+
+      border: 2px dashed #cbd5e1;
+
+      border-radius: 20px;
+
+      padding: 20px 16px;
+
+      margin: 16px 0;
+
+      box-shadow: 0 6px 16px rgba(0,0,0,0.05);
+
+      text-align: left;
+
+    }
+
+
+
+    .receipt-header {
+
+      text-align: center;
+
+      border-bottom: 2px dashed #cbd5e1;
+
+      padding-bottom: 10px;
+
+      margin-bottom: 10px;
+
+    }
+
+
+
+    .receipt-row {
+
+      display: flex;
+
+      justify-content: space-between;
+
+      font-size: 15px;
+
+      font-weight: 700;
+
+      margin-bottom: 6px;
+
+      color: #334155;
+
+    }
+
+
+
+    .receipt-total {
+
+      border-top: 2px solid #cbd5e1;
+
+      padding-top: 8px;
+
+      margin-top: 8px;
+
+      display: flex;
+
+      justify-content: space-between;
+
+      font-size: 18px;
+
+      font-weight: 900;
+
+      color: #1e3a5f;
+
+    }
+
+  </style>
+
+</head>
+
+<body>
+
+
+
+<div class="app-container">
+
+  <!-- 상단 헤더 -->
+
+  <div class="header">
+
+    <h1>🤝 디딤손 쉬운 주문</h1>
+
+    <div class="ai-badge">👁️ AI 맞춤 큰화면</div>
+
+  </div>
+
+
+
+  <!-- [화면 1] 3초 사용설명서 -->
+
+  <div id="screen-guide" class="screen active">
+
+    <div class="guide-box">
+
+      <div class="guide-title">📖 3초 사용설명서</div>
+
+      <div class="guide-step">
+
+        <div class="step-num">1</div>
+
+        <div class="step-text"><b>커피, 에이드, 빵</b> 등 종류를 먼저 고르세요.</div>
+
+      </div>
+
+      <div class="guide-step">
+
+        <div class="step-num">2</div>
+
+        <div class="step-text">쟁반에 <b>원하는 만큼 메뉴를 담으세요.</b></div>
+
+      </div>
+
+      <div class="guide-step" style="margin-bottom:0;">
+
+        <div class="step-num">3</div>
+
+        <div class="step-text"><b>할인·영수증 발행</b> 후 주문하면 끝!</div>
+
+      </div>
+
+    </div>
+
+
+
+    <div style="font-size: 20px; font-weight: 800; margin-bottom: 12px; color: #1e293b;">어디서 드시나요?</div>
+
+    <div class="place-select">
+
+      <button class="place-btn selected" id="btn-here" onclick="selectPlace('매장에서 먹고 가기')">🍽️ 먹고 가기</button>
+
+      <button class="place-btn" id="btn-togo" onclick="selectPlace('집으로 포장하기')">🛍️ 포장하기</button>
+
+    </div>
+
+
+
+    <button class="big-start-btn" onclick="goToTray()">쟁반 채우러 가기 👉</button>
+
+  </div>
+
+
+
+  <!-- [화면 2] 트레이 화면 -->
+
+  <div id="screen-tray" class="screen">
+
+    <div class="instruction-banner" id="place-banner">
+
+      👇 아래 쟁반을 눌러 메뉴를 담아주세요!
+
+    </div>
+
+
+
+    <div class="wood-tray">
+
+      <div class="tray-surface" id="tray-items-container"></div>
+
+    </div>
+
+
+
+    <div class="checkout-bar">
+
+      <div class="total-row">
+
+        <span class="total-label" id="total-count-label">총 0개 선택</span>
+
+        <span class="total-price" id="total-price">0원</span>
+
+      </div>
+
+      <button class="pay-btn" id="pay-btn" disabled onclick="goToBenefitScreen()">
+
+        메뉴를 먼저 담아주세요
+
+      </button>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- [화면 3] 적립, 쿠폰, 영수증 선택 화면 -->
+
+  <div id="screen-benefit" class="screen">
+
+    <div style="font-size: 21px; font-weight: 900; margin-bottom: 14px; color: #0f172a;">
+
+      🎁 마지막 단계: 할인 및 영수증 선택
+
+    </div>
+
+
+
+    <!-- 할인쿠폰 카드 -->
+
+    <div class="benefit-card">
+
+      <div class="benefit-title">🎟️ 할인쿠폰 사용하기</div>
+
+      <button class="coupon-btn" id="coupon-btn" onclick="toggleCoupon()">
+
+        <span>단골 어르신 1,000원 할인쿠폰</span>
+
+        <span id="coupon-status-text">누르면 적용 👉</span>
+
+      </button>
+
+    </div>
+
+
+
+    <!-- 영수증 발행 여부 선택 카드 -->
+
+    <div class="benefit-card">
+
+      <div class="benefit-title">📄 영수증을 출력할까요?</div>
+
+      <div class="receipt-select-grid">
+
+        <button class="receipt-option-btn selected" id="receipt-yes" onclick="setReceipt(true)">🧾 예 (출력하기)</button>
+
+        <button class="receipt-option-btn" id="receipt-no" onclick="setReceipt(false)">🚫 아니요 (안 함)</button>
+
+      </div>
+
+    </div>
+
+
+
+    <!-- 포인트 적립 키패드 카드 -->
+
+    <div class="benefit-card" style="margin-bottom: 10px;">
+
+      <div class="benefit-title">📱 휴대폰 번호로 포인트 적립 (선택)</div>
+
+      <div class="phone-display" id="phone-display">010 - </div>
+
+      <div class="keypad-grid">
+
+        <button class="key-btn" onclick="pressKey('1')">1</button>
+
+        <button class="key-btn" onclick="pressKey('2')">2</button>
+
+        <button class="key-btn" onclick="pressKey('3')">3</button>
+
+        <button class="key-btn" onclick="pressKey('4')">4</button>
+
+        <button class="key-btn" onclick="pressKey('5')">5</button>
+
+        <button class="key-btn" onclick="pressKey('6')">6</button>
+
+        <button class="key-btn" onclick="pressKey('7')">7</button>
+
+        <button class="key-btn" onclick="pressKey('8')">8</button>
+
+        <button class="key-btn" onclick="pressKey('9')">9</button>
+
+        <button class="key-btn" style="background:#fee2e2; color:#dc2626;" onclick="clearPhone()">지움</button>
+
+        <button class="key-btn" onclick="pressKey('0')">0</button>
+
+        <button class="key-btn" style="background:#e0f2fe; color:#0369a1;" onclick="backspacePhone()">←</button>
+
+      </div>
+
+    </div>
+
+
+
+    <div class="checkout-bar">
+
+      <div class="total-row">
+
+        <span class="total-label">최종 결제 금액</span>
+
+        <span class="total-price" id="final-benefit-price">0원</span>
+
+      </div>
+
+      <button class="pay-btn" onclick="completeOrder()">
+
+        결제 완료하기 ✅
+
+      </button>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- [화면 4] 주문 완료 및 영수증 내역 확인 화면 -->
+
+  <div id="screen-complete" class="screen">
+
+    <div class="complete-box">
+
+      <div style="font-size: 48px;">🎉</div>
+
+      <h2 style="font-size: 24px; font-weight: 900; margin-top: 6px;">주문이 완료되었습니다!</h2>
+
+      <p style="font-size: 16px; color: #475569; margin-top: 2px;" id="complete-place-text">매장에서 먹고 가기</p>
+
+
+
+      <!-- 디지털 영수증 명세서 카드 -->
+
+      <div class="ticket-card">
+
+        <div class="receipt-header">
+
+          <div style="font-size: 17px; font-weight: 900; color: #1e3a5f;">🤝 디딤손 매장 영수증</div>
+
+          <div style="font-size: 13px; color: #64748b;" id="receipt-time">대기번호: <b style="color:#d97706; font-size:18px;">104번</b></div>
+
+        </div>
+
+        <div id="receipt-items-list"></div>
+
+        <div id="receipt-discount-row"></div>
+
+        <div class="receipt-total">
+
+          <span>총 결제금액</span>
+
+          <span id="receipt-total-price">0원</span>
+
+        </div>
+
+        <div style="font-size: 13px; font-weight: 700; color: #16a34a; margin-top: 10px; text-align: center;" id="receipt-notice"></div>
+
+      </div>
+
+
+
+      <button class="big-start-btn" onclick="resetAll()">처음으로 돌아가기</button>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+
+<!-- 모달 1: 종류 선택 -->
+
+<div class="modal-overlay" id="modal-category">
+
+  <div class="modal-sheet">
+
+    <div class="modal-header">
+
+      <div class="modal-title">어떤 종류를 드실까요?</div>
+
+      <button class="close-btn" onclick="closeModals()">닫기 ✕</button>
+
+    </div>
+
+    <div class="category-grid">
+
+      <div class="cat-card" onclick="selectMenuCategory('coffee')">
+
+        <div class="cat-emoji">☕</div>
+
+        <div class="cat-name">커피</div>
+
+        <div class="cat-sub">아메리카노, 라떼</div>
+
+      </div>
+
+      <div class="cat-card" onclick="selectMenuCategory('ade')">
+
+        <div class="cat-emoji">🥤</div>
+
+        <div class="cat-name">에이드 · 차</div>
+
+        <div class="cat-sub">유자차, 레몬에이드</div>
+
+      </div>
+
+      <div class="cat-card" onclick="selectMenuCategory('latte')">
+
+        <div class="cat-emoji">🍓</div>
+
+        <div class="cat-name">라떼 · 초코</div>
+
+        <div class="cat-sub">딸기라떼, 초코라떼</div>
+
+      </div>
+
+      <div class="cat-card" onclick="selectMenuCategory('frappe')">
+
+        <div class="cat-emoji">🍧</div>
+
+        <div class="cat-name">스무디 · 프라페</div>
+
+        <div class="cat-sub">망고스무디, 퐁크러쉬</div>
+
+      </div>
+
+      <div class="cat-card" onclick="selectMenuCategory('season')">
+
+        <div class="cat-emoji">🌟</div>
+
+        <div class="cat-name">겨울 · 신메뉴</div>
+
+        <div class="cat-sub">모찌밀크티, 매실모과</div>
+
+      </div>
+
+      <div class="cat-card" onclick="selectMenuCategory('food')">
+
+        <div class="cat-emoji">🥐</div>
+
+        <div class="cat-name">빵 · 디저트</div>
+
+        <div class="cat-sub">소금빵, 감자빵</div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+
+<!-- 모달 2: 온도 선택 -->
+
+<div class="modal-overlay" id="modal-temp">
+
+  <div class="modal-sheet">
+
+    <div class="modal-header">
+
+      <div class="modal-title">어떤 온도로 드릴까요?</div>
+
+      <button class="close-btn" onclick="closeModals()">닫기 ✕</button>
+
+    </div>
+
+    <div class="temp-grid">
+
+      <button class="temp-btn temp-cold" onclick="showFilteredMenus('차가운')">
+
+        <span style="font-size: 48px;">❄️</span>
+
+        <span>차가운 음료</span>
+
+      </button>
+
+      <button class="temp-btn temp-hot" onclick="showFilteredMenus('따뜻한')">
+
+        <span style="font-size: 48px;">🔥</span>
+
+        <span>따뜻한 음료</span>
+
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+
+<!-- 모달 3: 세부 메뉴 선택 -->
+
+<div class="modal-overlay" id="modal-menu">
+
+  <div class="modal-sheet">
+
+    <div class="modal-header">
+
+      <div class="modal-title" id="menu-modal-title">메뉴를 골라주세요</div>
+
+      <button class="close-btn" onclick="closeModals()">닫기 ✕</button>
+
+    </div>
+
+    <div class="menu-grid" id="menu-list-container"></div>
+
+  </div>
+
+</div>
+
+
+
+<script>
+
+  let selectedPlace = '매장에서 먹고 가기';
+
+  let cartItems = [];
+
+  let selectedCategory = '';
+
+  let isCouponApplied = false;
+
+  let needReceipt = true; // 기본 영수증 출력함
+
+  let phoneDigits = '';
+
+
+
+  const menuDB = {
+
+    coffee: {
+
+      hasTemp: true,
+
+      '차가운': [
+
+        { emoji: '🧊☕', name: '아이스 아메리카노', desc: '기본 2샷 시원한 커피', price: 2000 },
+
+        { emoji: '🧊💪', name: '메가리카노 (대용량)', desc: '32oz 엄청 큰 아메리카노', price: 3300 },
+
+        { emoji: '🤎', name: '할메가커피', desc: '달달한 옛날 믹스커피 스타일', price: 2100 },
+
+        { emoji: '🌾', name: '할메가미숫커피', desc: '미숫가루 + 커피 조합', price: 2900 }
+
+      ],
+
+      '따뜻한': [
+
+        { emoji: '☕', name: '따뜻한 아메리카노', desc: '기본 2샷 따뜻한 커피', price: 1700 },
+
+        { emoji: '🥛', name: '따뜻한 카페라떼', desc: '부드러운 우유 커피', price: 2900 }
+
+      ]
+
+    },
+
+    ade: {
+
+      hasTemp: true,
+
+      '차가운': [
+
+        { emoji: '🥤', name: '메가에이드', desc: '레몬 + 라임 + 자몽 조합', price: 3900 },
+
+        { emoji: '🍋', name: '레몬에이드', desc: '상큼시원한 레몬 음료', price: 3500 },
+
+        { emoji: '🍑', name: '제로 복숭아아이스티', desc: '칼로리 없는 복숭아 티', price: 3000 }
+
+      ],
+
+      '따뜻한': [
+
+        { emoji: '🍊', name: '따뜻한 유자차', desc: '향긋하고 달콤한 전통차', price: 3300 },
+
+        { emoji: '🍎', name: '사과유자차', desc: '사과와 유자의 상콤달콤', price: 3500 }
+
+      ]
+
+    },
+
+    latte: {
+
+      hasTemp: true,
+
+      '차가운': [
+
+        { emoji: '🍓', name: '딸기라떼 (ICE)', desc: '달콤상큼 생딸기 우유', price: 3700 },
+
+        { emoji: '🍫', name: '아이스 초코라떼', desc: '진한 초코 음료', price: 3500 }
+
+      ],
+
+      '따뜻한': [
+
+        { emoji: '🍫', name: '따뜻한 초코라떼', desc: '속이 따뜻해지는 초코', price: 3500 },
+
+        { emoji: '🍠', name: '따뜻한 고구마라떼', desc: '든든하고 달콤한 고구마', price: 3500 }
+
+      ]
+
+    },
+
+    frappe: {
+
+      hasTemp: false,
+
+      items: [
+
+        { emoji: '🍪', name: '쿠키프라페', desc: '달콤한 쿠키 앤 크림', price: 3900 },
+
+        { emoji: '🥭', name: '골드망고스무디', desc: '달콤시원한 망고 스무디', price: 3900 },
+
+        { emoji: '🫐', name: '블루베리 요거트스무디', desc: '새콤달콤 요거트', price: 3900 }
+
+      ]
+
+    },
+
+    season: {
+
+      hasTemp: false,
+
+      items: [
+
+        { emoji: '🍒🍫', name: '딥 초코 체리 프라페', desc: '겨울 시즌 진한 초코+체리', price: 4400 },
+
+        { emoji: '🧋', name: '쫀득 모찌 밀크티', desc: '율무·우롱 + 모찌펄 토핑', price: 4000 },
+
+        { emoji: '🍵', name: '향긋한 매실 모과차', desc: '겨울 한정 모과청 블렌딩', price: 3500 }
+
+      ]
+
+    },
+
+    food: {
+
+      hasTemp: false,
+
+      items: [
+
+        { emoji: '🥐', name: '버터버터 소금빵', desc: '겉바속촉 소금빵', price: 3200 },
+
+        { emoji: '🥪', name: '햄치즈 구운 식빵', desc: '따뜻한 크로크무슈', price: 3900 },
+
+        { emoji: '🥔', name: '담백한 감자빵', desc: '진짜 감자 모양 쫄깃빵', price: 3500 }
+
+      ]
+
+    }
+
+  };
+
+
+
+  function selectPlace(place) {
+
+    selectedPlace = place;
+
+    document.getElementById('btn-here').classList.toggle('selected', place === '매장에서 먹고 가기');
+
+    document.getElementById('btn-togo').classList.toggle('selected', place === '집으로 포장하기');
+
+  }
+
+
+
+  function goToTray() {
+
+    document.getElementById('screen-guide').classList.remove('active');
+
+    document.getElementById('screen-tray').classList.add('active');
+
+    document.getElementById('place-banner').innerText = `[${selectedPlace}] 쟁반에 원하는 메뉴를 담아주세요!`;
+
+    renderTray();
+
+  }
+
+
+
+  function renderTray() {
+
+    const container = document.getElementById('tray-items-container');
+
+    container.innerHTML = '';
+
+
+
+    cartItems.forEach((item, index) => {
+
+      const card = document.createElement('div');
+
+      card.className = 'tray-item-card';
+
+      card.innerHTML = `
+
+        <button class="delete-item-btn" onclick="removeItem(${index})">✕</button>
+
+        <div class="item-emoji">${item.emoji}</div>
+
+        <div class="item-name">${item.name}</div>
+
+        <div class="item-price">${item.price.toLocaleString()}원</div>
+
+      `;
+
+      container.appendChild(card);
+
+    });
+
+
+
+    const addBtn = document.createElement('div');
+
+    addBtn.className = 'add-slot-btn';
+
+    addBtn.onclick = openCategoryModal;
+
+    addBtn.innerHTML = `
+
+      <div class="add-icon-circle">+</div>
+
+      <div class="add-slot-title">${cartItems.length === 0 ? '메뉴 담기' : '메뉴 더 담기'}</div>
+
+      <div class="add-slot-sub">눌러서 종류 선택</div>
+
+    `;
+
+    container.appendChild(addBtn);
+
+
+
+    const totalCount = cartItems.length;
+
+    const totalPrice = getRawTotal();
+
+
+
+    document.getElementById('total-count-label').innerText = `총 ${totalCount}개 선택`;
+
+    document.getElementById('total-price').innerText = `${totalPrice.toLocaleString()}원`;
+
+
+
+    const payBtn = document.getElementById('pay-btn');
+
+    if (totalCount > 0) {
+
+      payBtn.disabled = false;
+
+      payBtn.innerText = `다음: 적립·할인받기 👉`;
+
+    } else {
+
+      payBtn.disabled = true;
+
+      payBtn.innerText = '메뉴를 먼저 담아주세요';
+
+    }
+
+  }
+
+
+
+  function getRawTotal() {
+
+    return cartItems.reduce((sum, item) => sum + item.price, 0);
+
+  }
+
+
+
+  function removeItem(index) {
+
+    cartItems.splice(index, 1);
+
+    renderTray();
+
+  }
+
+
+
+  function openCategoryModal() {
+
+    document.getElementById('modal-category').classList.add('active');
+
+  }
+
+
+
+  function selectMenuCategory(catKey) {
+
+    selectedCategory = catKey;
+
+    closeModals();
+
+
+
+    const categoryData = menuDB[catKey];
+
+    if (categoryData.hasTemp) {
+
+      document.getElementById('modal-temp').classList.add('active');
+
+    } else {
+
+      renderMenuCards(categoryData.items, '원하시는 메뉴를 골라주세요');
+
+      document.getElementById('modal-menu').classList.add('active');
+
+    }
+
+  }
+
+
+
+  function showFilteredMenus(temp) {
+
+    closeModals();
+
+    const items = menuDB[selectedCategory][temp];
+
+    renderMenuCards(items, `${temp} 메뉴를 골라주세요`);
+
+    document.getElementById('modal-menu').classList.add('active');
+
+  }
+
+
+
+  function renderMenuCards(items, titleText) {
+
+    document.getElementById('menu-modal-title').innerText = titleText;
+
+    const container = document.getElementById('menu-list-container');
+
+    container.innerHTML = '';
+
+
+
+    items.forEach(item => {
+
+      const card = document.createElement('div');
+
+      card.className = 'menu-card';
+
+      card.innerHTML = `
+
+        <div class="menu-emoji">${item.emoji}</div>
+
+        <div class="menu-name">${item.name}</div>
+
+        <div class="menu-desc">${item.desc}</div>
+
+        <div class="menu-price">${item.price.toLocaleString()}원</div>
+
+      `;
+
+      card.onclick = () => {
+
+        cartItems.push(item);
+
+        renderTray();
+
+        closeModals();
+
+      };
+
+      container.appendChild(card);
+
+    });
+
+  }
+
+
+
+  function closeModals() {
+
+    document.getElementById('modal-category').classList.remove('active');
+
+    document.getElementById('modal-temp').classList.remove('active');
+
+    document.getElementById('modal-menu').classList.remove('active');
+
+  }
+
+
+
+  function goToBenefitScreen() {
+
+    document.getElementById('screen-tray').classList.remove('active');
+
+    document.getElementById('screen-benefit').classList.add('active');
+
+    updateBenefitPrice();
+
+  }
+
+
+
+  function toggleCoupon() {
+
+    isCouponApplied = !isCouponApplied;
+
+    const btn = document.getElementById('coupon-btn');
+
+    const statusText = document.getElementById('coupon-status-text');
+
+    
+
+    if (isCouponApplied) {
+
+      btn.classList.add('applied');
+
+      statusText.innerText = '적용 완료 (-1,000원) ✅';
+
+    } else {
+
+      btn.classList.remove('applied');
+
+      statusText.innerText = '누르면 적용 👉';
+
+    }
+
+    updateBenefitPrice();
+
+  }
+
+
+
+  function setReceipt(status) {
+
+    needReceipt = status;
+
+    document.getElementById('receipt-yes').classList.toggle('selected', status);
+
+    document.getElementById('receipt-no').classList.toggle('selected', !status);
+
+  }
+
+
+
+  function pressKey(num) {
+
+    if (phoneDigits.length < 8) {
+
+      phoneDigits += num;
+
+      updatePhoneDisplay();
+
+    }
+
+  }
+
+
+
+  function backspacePhone() {
+
+    phoneDigits = phoneDigits.slice(0, -1);
+
+    updatePhoneDisplay();
+
+  }
+
+
+
+  function clearPhone() {
+
+    phoneDigits = '';
+
+    updatePhoneDisplay();
+
+  }
+
+
+
+  function updatePhoneDisplay() {
+
+    let formatted = '010 - ';
+
+    if (phoneDigits.length <= 4) {
+
+      formatted += phoneDigits;
+
+    } else {
+
+      formatted += phoneDigits.slice(0, 4) + ' - ' + phoneDigits.slice(4);
+
+    }
+
+    document.getElementById('phone-display').innerText = formatted;
+
+  }
+
+
+
+  function updateBenefitPrice() {
+
+    let finalPrice = getRawTotal() - (isCouponApplied ? 1000 : 0);
+
+    if (finalPrice < 0) finalPrice = 0;
+
+    document.getElementById('final-benefit-price').innerText = `${finalPrice.toLocaleString()}원`;
+
+  }
+
+
+
+  function completeOrder() {
+
+    document.getElementById('screen-benefit').classList.remove('active');
+
+    document.getElementById('screen-complete').classList.add('active');
+
+    document.getElementById('complete-place-text').innerText = `주문 방식: ${selectedPlace}`;
+
+
+
+    // 영수증 내역 생성
+
+    const listContainer = document.getElementById('receipt-items-list');
+
+    listContainer.innerHTML = '';
+
+    cartItems.forEach(item => {
+
+      const row = document.createElement('div');
+
+      row.className = 'receipt-row';
+
+      row.innerHTML = `<span>${item.name}</span><span>${item.price.toLocaleString()}원</span>`;
+
+      listContainer.appendChild(row);
+
+    });
+
+
+
+    const discountRow = document.getElementById('receipt-discount-row');
+
+    if (isCouponApplied) {
+
+      discountRow.innerHTML = `<div class="receipt-row" style="color:#b45309;"><span>단골 쿠폰 할인</span><span>-1,000원</span></div>`;
+
+    } else {
+
+      discountRow.innerHTML = '';
+
+    }
+
+
+
+    let finalPrice = getRawTotal() - (isCouponApplied ? 1000 : 0);
+
+    if (finalPrice < 0) finalPrice = 0;
+
+    document.getElementById('receipt-total-price').innerText = `${finalPrice.toLocaleString()}원`;
+
+
+
+    let noticeText = needReceipt ? '🧾 종이 영수증이 출력되고 있습니다.' : '🚫 종이 영수증은 출력하지 않았습니다.';
+
+    if (phoneDigits.length === 8) {
+
+      noticeText += ` / 📱 010-${phoneDigits.slice(0,4)}-${phoneDigits.slice(4)} 적립 완료`;
+
+    }
+
+    document.getElementById('receipt-notice').innerText = noticeText;
+
+  }
+
+
+
+  function resetAll() {
+
+    cartItems = [];
+
+    isCouponApplied = false;
+
+    needReceipt = true;
+
+    phoneDigits = '';
+
+    setReceipt(true);
+
+    updatePhoneDisplay();
+
+    
+
+    const btn = document.getElementById('coupon-btn');
+
+    btn.classList.remove('applied');
+
+    document.getElementById('coupon-status-text').innerText = '누르면 적용 👉';
+
+
+
+    document.getElementById('screen-complete').classList.remove('active');
+
+    document.getElementById('screen-guide').classList.add('active');
+
+  }
+
+</script>
+
+
+
+</body>
+
+</html>
+
